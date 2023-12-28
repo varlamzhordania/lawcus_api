@@ -1,3 +1,5 @@
+from utils import table_exists
+
 def create_leads_table(cursor):
     """
     Create a table for Leads in the Oracle database if it doesn't exist.

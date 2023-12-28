@@ -1,3 +1,6 @@
+from utils import table_exists
+
+
 def create_interactions_table(cursor):
     """
     Create a table for Interactions in the Oracle database if it doesn't exist.

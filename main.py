@@ -1,20 +1,20 @@
-import cx_Oracle
+import os
+import platform
+import oracledb
 import requests
-from contact import create_contact_table, insert_contacts_into_table
+from contacts import create_contact_table, insert_contacts_into_table
+from accounts import create_accounts_table, insert_accounts_into_table
+from interactions import create_interactions_table, insert_interactions_into_table
+from leads import create_leads_table, insert_leads_into_table
+from matters import create_matters_table, insert_matters_into_table
+from tasks import create_tasks_table, insert_tasks_into_table
 
 # Placeholder database connection parameters
-DB_USERNAME = "your_db_username"
-DB_PASSWORD = "your_db_password"
-DB_HOST = "your_db_host"
-DB_PORT = "your_db_port"
-DB_SERVICE_NAME = "your_db_service_name"
-
-# Placeholder API endpoint and headers
-API_BASE_URL = "https://api.us.lawcus.com"
-API_HEADERS = {
-    "Authorization": "Bearer your_api_token",
-    "Content-Type": "application/json",
-}
+DB_USERNAME = "root"  # "your_db_username"
+DB_PASSWORD = "1234"  # "your_db_password"
+DB_HOST = "localhost"  # "your_db_host"
+DB_PORT = 1521
+DB_SID = "xe"  # "your_db_sid"
 
 
 def connect_to_database():
@@ -23,8 +23,14 @@ def connect_to_database():
 
     Replace the placeholder values with your actual database connection details.
     """
-    dsn = cx_Oracle.makedsn(DB_HOST, DB_PORT, service_name=DB_SERVICE_NAME)
-    connection = cx_Oracle.connect(DB_USERNAME, DB_PASSWORD, dsn=dsn)
+    # dsn = oracledb.makedsn(host=DB_HOST, port=DB_PORT, sid=DB_SID)
+    d = None  # default suitable for Linux
+    if platform.system() == "Darwin" and platform.machine() == "x86_64":  # macOS
+        d = os.environ.get("HOME") + ("/Downloads/instantclient_21_12")
+    elif platform.system() == "Windows":
+        d = r"C:\oracle\instantclient_21_12"
+    oracledb.init_oracle_client(lib_dir=d)
+    connection = oracledb.connect(user=DB_USERNAME, password=DB_PASSWORD, host=DB_HOST, port=DB_PORT, sid=DB_SID)
     cursor = connection.cursor()
     return cursor
 
@@ -46,31 +52,34 @@ def make_api_request(endpoint):
         return None
 
 
-def table_exists(cursor, table_name):
-    """
-    Check if a table already exists in the Oracle database.
+def get_api_token():
+    pass
 
-    :param cursor: Oracle database cursor
-    :param table_name: Name of the table to check
-    :return: True if the table exists, False otherwise
-    """
-    check_query = f"SELECT count(*) FROM all_tables WHERE table_name = '{table_name.upper()}'"
-    cursor.execute(check_query)
-    result = cursor.fetchone()
 
-    return result[0] > 0
-
+# Placeholder API endpoint and headers
+API_BASE_URL = "https://api.us.lawcus.com"
+API_ACCESS_TOKEN = ""
+API_HEADERS = {
+    "Authorization": f"Oauth Bearer {API_ACCESS_TOKEN}",
+    "Content-Type": "application/json",
+}
 
 if __name__ == "__main__":
     # Connect to the Oracle database
     oracle_cursor = connect_to_database()
 
+    create_contact_table(oracle_cursor)
+    create_matters_table(oracle_cursor)
+    create_leads_table(oracle_cursor)
+    create_interactions_table(oracle_cursor)
+    create_tasks_table(oracle_cursor)
+    create_accounts_table(oracle_cursor)
     # Make API request for the Contacts endpoint
-    contacts_data = make_api_request("contacts")
+    # contacts_data = make_api_request("contacts")
 
-    if contacts_data:
-        # Insert Contacts data into the Oracle database
-        insert_contacts_into_table(oracle_cursor, contacts_data["list"])
+    # if contacts_data:
+    #     # Insert Contacts data into the Oracle database
+    #     insert_contacts_into_table(oracle_cursor, contacts_data["list"])
 
     # Close the database cursor when done
-    oracle_cursor.close()
+    # oracle_cursor.close()

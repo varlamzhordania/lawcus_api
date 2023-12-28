@@ -1,3 +1,6 @@
+from utils import table_exists
+
+
 def create_tasks_table(cursor):
     """
     Create a table for Tasks in the Oracle database if it doesn't exist.
@@ -14,13 +17,13 @@ def create_tasks_table(cursor):
             name VARCHAR2(255),
             due_date TIMESTAMP,
             start_date TIMESTAMP,
-            is_completed BOOLEAN,
-            is_custom_time BOOLEAN,
+            is_completed NUMBER(1,0),
+            is_custom_time NUMBER(1,0),
             created_by NUMBER,
             matter_id NUMBER,
             due_type VARCHAR2(255),
             due_settings VARCHAR2(255),
-            is_private BOOLEAN,
+            is_private NUMBER(1,0),
             repeat VARCHAR2(255),
             tags VARCHAR2(255),
             sort_field TIMESTAMP,

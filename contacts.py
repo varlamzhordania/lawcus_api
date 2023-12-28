@@ -1,3 +1,5 @@
+from utils import table_exists
+
 def create_contact_table(cursor):
     """
     Create a table for Contacts in the Oracle database if it doesn't exist.
@@ -36,7 +38,7 @@ def create_contact_table(cursor):
             integration_id VARCHAR2(255),
             box_folder_id VARCHAR2(255),
             box_shared_link VARCHAR2(255),
-            number VARCHAR2(255),
+            "number" VARCHAR2(255),
             quickbooks_id VARCHAR2(255),
             google_drive_folder_id VARCHAR2(255),
             one_drive_folder_id VARCHAR2(255),
@@ -59,7 +61,7 @@ def create_contact_table(cursor):
             date_of_birthday VARCHAR2(255),
             note VARCHAR2(255),
             street2 VARCHAR2(255),
-            is_lead BOOLEAN,
+            is_lead NUMBER(1,0),
             quickbooks_error VARCHAR2(255),
             ledes_client_id VARCHAR2(255)
         )

@@ -1,3 +1,6 @@
+from utils import table_exists
+
+
 def create_accounts_table(cursor):
     """
     Create a table for Accounts in the Oracle database if it doesn't exist.
@@ -15,7 +18,7 @@ def create_accounts_table(cursor):
             holder VARCHAR2(255),
             institution VARCHAR2(255),
             domicile_branch VARCHAR2(255),
-            number VARCHAR2(255),
+            "number" VARCHAR2(255),
             transit_number VARCHAR2(255),
             swift VARCHAR2(255),
             currency VARCHAR2(255),
@@ -24,7 +27,7 @@ def create_accounts_table(cursor):
             team_id NUMBER,
             integration_type VARCHAR2(255),
             connected_with VARCHAR2(255),
-            is_default BOOLEAN
+            is_default NUMBER(1,0)
         )
         """
         cursor.execute(table_creation_query)
