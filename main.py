@@ -80,7 +80,6 @@ def make_api_request(endpoint, params=None, base_url=None, headers=None, **kwarg
 
 
 def get_api_token():
-    # Add your code to get the API token here
     pass
 
 
