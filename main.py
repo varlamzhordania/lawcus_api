@@ -83,8 +83,16 @@ def get_api_token():
     pass
 
 
-if __name__ == "__main__":
+def create_all_tables():
+    create_contact_table(oracle_cursor)
+    create_matters_table(oracle_cursor)
+    create_leads_table(oracle_cursor)
+    create_interactions_table(oracle_cursor)
+    create_tasks_table(oracle_cursor)
+    create_accounts_table(oracle_cursor)
 
+
+if __name__ == "__main__":
     # Placeholder database connection parameters
     DB_USERNAME = "root"  # Replace with your DB username
     DB_PASSWORD = "1234"  # Replace with your DB password
@@ -121,30 +129,32 @@ if __name__ == "__main__":
         ("accounts", None),
     ]
 
-    for endpoint, params in endpoints:
-        # Make API request for the current endpoint
-        endpoint_data = make_api_request(endpoint=endpoint, params=params, base_url=API_BASE_URL, headers=API_HEADERS)
+    # for endpoint, params in endpoints:
+    #     # Make API request for the current endpoint
+    #     endpoint_data = make_api_request(endpoint=endpoint, params=params, base_url=API_BASE_URL, headers=API_HEADERS)
 
-        if endpoint_data:
-            # Execute the corresponding function based on the endpoint
-            if endpoint == "contacts":
-                create_contact_table(oracle_cursor)
-                insert_contacts_into_table(oracle_cursor, endpoint_data["list"])
-            elif endpoint == "matters":
-                create_matters_table(oracle_cursor)
-                insert_matters_into_table(oracle_cursor, endpoint_data["list"])
-            elif endpoint == "leadsources":
-                create_leads_table(oracle_cursor)
-                insert_leads_into_table(oracle_cursor, endpoint_data)
-            elif endpoint == "interactions":
-                create_interactions_table(oracle_cursor)
-                insert_interactions_into_table(oracle_cursor, endpoint_data["list"])
-            elif endpoint == "tasks":
-                create_tasks_table(oracle_cursor)
-                insert_tasks_into_table(oracle_cursor, endpoint_data)
-            elif endpoint == "accounts":
-                create_accounts_table(oracle_cursor)
-                insert_accounts_into_table(oracle_cursor, endpoint_data)
+    # if endpoint_data:
+    #     # Execute the corresponding function based on the endpoint
+    #     if endpoint == "contacts":
+    #         create_contact_table(oracle_cursor)
+    #         insert_contacts_into_table(oracle_cursor, endpoint_data["list"])
+    #     elif endpoint == "matters":
+    #         create_matters_table(oracle_cursor)
+    #         insert_matters_into_table(oracle_cursor, endpoint_data["list"])
+    #     elif endpoint == "leadsources":
+    #         create_leads_table(oracle_cursor)
+    #         insert_leads_into_table(oracle_cursor, endpoint_data)
+    #     elif endpoint == "interactions":
+    #         create_interactions_table(oracle_cursor)
+    #         insert_interactions_into_table(oracle_cursor, endpoint_data["list"])
+    #     elif endpoint == "tasks":
+    #         create_tasks_table(oracle_cursor)
+    #         insert_tasks_into_table(oracle_cursor, endpoint_data)
+    #     elif endpoint == "accounts":
+    #         create_accounts_table(oracle_cursor)
+    #         insert_accounts_into_table(oracle_cursor, endpoint_data)
+
+    create_all_tables()
 
     # Close the database cursor when done
     oracle_cursor.close()

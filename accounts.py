@@ -7,27 +7,27 @@ def create_accounts_table(cursor):
 
     Modify the table creation query based on your specific requirements.
     """
-    table_name = "lawkpis_lawcus_accounts"
+    table_name = "LAWCUS_ACCOUNTS"
 
     if not table_exists(cursor, table_name):
         table_creation_query = """
-        CREATE TABLE lawkpis_lawcus_accounts (
-            id VARCHAR2(255),
-            account_type VARCHAR2(255),
-            name VARCHAR2(255),
-            holder VARCHAR2(255),
-            institution VARCHAR2(255),
-            domicile_branch VARCHAR2(255),
-            "number" VARCHAR2(255),
-            transit_number VARCHAR2(255),
-            swift VARCHAR2(255),
-            currency VARCHAR2(255),
-            balance NUMBER,
-            created_by NUMBER,
-            team_id NUMBER,
-            integration_type VARCHAR2(255),
-            connected_with VARCHAR2(255),
-            is_default NUMBER(1,0)
+        CREATE TABLE LAWCUS_ACCOUNTS (
+            ACCOUNT_ID VARCHAR2(4000),
+            ACCOUNT_TYPE VARCHAR2(4000),
+            NAME VARCHAR2(4000),
+            HOLDER VARCHAR2(4000),
+            INSTITUTION VARCHAR2(4000),
+            DOMICILE_BRANCH VARCHAR2(4000),
+            NUMBERS VARCHAR2(4000),
+            TRANSIT_NUMBER VARCHAR2(4000),
+            SWIFT VARCHAR2(4000),
+            CURRENCY VARCHAR2(4000),
+            BALANCE VARCHAR2(4000),
+            CREATED_BY VARCHAR2(4000),
+            TEAM_ID VARCHAR2(4000),
+            INTEGRATION_TYPE VARCHAR2(4000),
+            CONNECTED_WITH VARCHAR2(4000),
+            IS_DEFAULT VARCHAR2(4000)
         )
         """
         cursor.execute(table_creation_query)
@@ -43,10 +43,10 @@ def insert_accounts_into_table(cursor, accounts):
     Modify the insert query based on your specific requirements.
     """
     insert_query = """
-    INSERT INTO lawkpis_lawcus_accounts (
-        id, account_type, name, holder, institution, domicile_branch, number,
-        transit_number, swift, currency, balance, created_by, team_id,
-        integration_type, connected_with, is_default
+    INSERT INTO LAWCUS_ACCOUNTS (
+        ACCOUNT_ID, ACCOUNT_TYPE, NAME, HOLDER, INSTITUTION, DOMICILE_BRANCH,
+        NUMBERS, TRANSIT_NUMBER, SWIFT, CURRENCY, BALANCE, CREATED_BY,
+        TEAM_ID, INTEGRATION_TYPE, CONNECTED_WITH, IS_DEFAULT
     ) VALUES (
         :id, :account_type, :name, :holder, :institution, :domicile_branch,
         :number, :transit_number, :swift, :currency, :balance, :created_by,

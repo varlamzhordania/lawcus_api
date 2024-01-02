@@ -7,28 +7,28 @@ def create_tasks_table(cursor):
 
     Modify the table creation query based on your specific requirements.
     """
-    table_name = "lawkpis_lawcus_tasks"
+    table_name = "LAWCUS_TASKS"
 
     if not table_exists(cursor, table_name):
         table_creation_query = """
-        CREATE TABLE lawkpis_lawcus_tasks (
-            id VARCHAR2(255),
-            item_id NUMBER,
-            name VARCHAR2(255),
-            due_date TIMESTAMP,
-            start_date TIMESTAMP,
-            is_completed NUMBER(1,0),
-            is_custom_time NUMBER(1,0),
-            created_by NUMBER,
-            matter_id NUMBER,
-            due_type VARCHAR2(255),
-            due_settings VARCHAR2(255),
-            is_private NUMBER(1,0),
-            repeat VARCHAR2(255),
-            tags VARCHAR2(255),
-            sort_field TIMESTAMP,
-            sub_tasks_count NUMBER,
-            assign_id VARCHAR2(255)
+        CREATE TABLE LAWCUS_TASKS (
+            TASK_ID VARCHAR2(4000),
+            ITEM_ID VARCHAR2(4000),
+            NAME VARCHAR2(4000),
+            DUE_DATE VARCHAR2(4000),
+            START_DATE VARCHAR2(4000),
+            IS_COMPLETED VARCHAR2(4000),
+            IS_CUSTOM_TIME VARCHAR2(4000),
+            CREATED_BY VARCHAR2(4000),
+            MATTER_ID VARCHAR2(4000),
+            DUE_TYPE VARCHAR2(4000),
+            DUE_SETTINGS VARCHAR2(4000),
+            IS_PRIVATE VARCHAR2(4000),
+            REPEAT VARCHAR2(4000),
+            TAGS VARCHAR2(4000),
+            SORT_FIELD VARCHAR2(4000),
+            SUB_TASKS_COUNT VARCHAR2(4000),
+            ASSIGN_ID VARCHAR2(4000)
         )
         """
         cursor.execute(table_creation_query)
@@ -44,15 +44,14 @@ def insert_tasks_into_table(cursor, tasks):
     Modify the insert query based on your specific requirements.
     """
     insert_query = """
-    INSERT INTO lawkpis_lawcus_tasks (
-        id, item_id, name, due_date, start_date, is_completed, is_custom_time,
-        created_by, matter_id, due_type, due_settings, is_private, repeat, tags,
-        sort_field, sub_tasks_count, assign_id
+    INSERT INTO LAWCUS_TASKS (
+        TASK_ID, ITEM_ID, NAME, DUE_DATE, START_DATE, IS_COMPLETED, IS_CUSTOM_TIME,
+        CREATED_BY, MATTER_ID, DUE_TYPE, DUE_SETTINGS, IS_PRIVATE, REPEAT, TAGS,
+        SORT_FIELD, SUB_TASKS_COUNT, ASSIGN_ID
     ) VALUES (
-        :id, :item_id, :name, TO_TIMESTAMP(:due_date, 'YYYY-MM-DD HH24:MI:SS'),
-        TO_TIMESTAMP(:start_date, 'YYYY-MM-DD HH24:MI:SS'), :is_completed,
+        :id, :item_id, :name, :due_date,:start_date, :is_completed,
         :is_custom_time, :created_by, :matter_id, :due_type, :due_settings,
-        :is_private, :repeat, :tags, TO_TIMESTAMP(:sort_field, 'YYYY-MM-DD HH24:MI:SS'),
+        :is_private, :repeat, :tags,:sort_field,
         :sub_tasks_count, :assign_id
     )
     """

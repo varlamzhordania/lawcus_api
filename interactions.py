@@ -7,22 +7,22 @@ def create_interactions_table(cursor):
 
     Modify the table creation query based on your specific requirements.
     """
-    table_name = "lawkpis_lawcus_interactions"
+    table_name = "LAWCUS_INTERACTIONS"
 
     if not table_exists(cursor, table_name):
         table_creation_query = """
-        CREATE TABLE lawkpis_lawcus_interactions (
-            id VARCHAR2(255),
-            interaction_date TIMESTAMP,
-            subject VARCHAR2(255),
-            body CLOB,
-            interaction_type VARCHAR2(255),
-            interaction_type_in VARCHAR2(255),
-            matter_id NUMBER,
-            contact_id NUMBER,
-            invoice_timeentries_id VARCHAR2(255),
-            created_by NUMBER,
-            created_at TIMESTAMP
+        CREATE TABLE LAWCUS_INTERACTIONS (
+            INTERACTION_ID VARCHAR2(4000),
+            INTERACTION_DATE VARCHAR2(4000),
+            SUBJECT VARCHAR2(4000),
+            BODY VARCHAR2(4000),
+            INTERACTION_TYPE VARCHAR2(4000),
+            INTERACTION_TYPE_IN VARCHAR2(4000),
+            MATTER_ID VARCHAR2(4000),
+            CONTACT_ID VARCHAR2(4000),
+            INVOICE_TIMEENTRIES_ID VARCHAR2(4000),
+            CREATED_BY VARCHAR2(4000),
+            CREATED_AT VARCHAR2(4000)
         )
         """
         cursor.execute(table_creation_query)
@@ -38,13 +38,13 @@ def insert_interactions_into_table(cursor, interactions):
     Modify the insert query based on your specific requirements.
     """
     insert_query = """
-    INSERT INTO lawkpis_lawcus_interactions (
-        id, interaction_date, subject, body, interaction_type, interaction_type_in,
-        matter_id, contact_id, invoice_timeentries_id, created_by, created_at
+    INSERT INTO LAWCUS_INTERACTIONS (
+        INTERACTION_ID, INTERACTION_DATE, SUBJECT, BODY, INTERACTION_TYPE, INTERACTION_TYPE_IN,
+        MATTER_ID, CONTACT_ID, INVOICE_TIMEENTRIES_ID, CREATED_BY, CREATED_AT
     ) VALUES (
-        :id, TO_TIMESTAMP(:date, 'YYYY-MM-DD HH24:MI:SS'), :subject, :body,
+        :id,:date, :subject, :body,
         :type, :type_in, :matter_id, :contact_id, :invoice_timeentries_id,
-        :created_by, TO_TIMESTAMP(:created_at, 'YYYY-MM-DD HH24:MI:SS')
+        :created_by,:created_at
     )
     """
 
