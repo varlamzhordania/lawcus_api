@@ -233,3 +233,66 @@ def insert_activity_category_into_table(cursor, activity_categories):
     for activity_category in activity_categories:
         cursor.execute(insert_query, activity_category)
     print("Activity Categories inserted into the table successfully.")
+
+
+def create_activity_billing_items_table(cursor):
+    """
+    Create a table for LAWOCUS Billing Items in the Oracle database if it doesn't exist.
+
+    Modify the table creation query based on your specific requirements.
+    """
+    table_name = "LAWCUS_ACTIVITY_BILLING_ITEMS"
+
+    if not table_exists(cursor, table_name):
+        table_creation_query = """
+        CREATE TABLE LAWCUS_ACTIVITY_BILLING_ITEMS (
+            BILLING_ITEM_ID VARCHAR2(4000),
+            START_DATE VARCHAR2(4000),
+            END_DATE VARCHAR2(4000),
+            ITEMS VARCHAR2(4000),
+            USER_ID VARCHAR2(4000),
+            PRACTICE_ID VARCHAR2(4000),
+            IS_INVOICED VARCHAR2(4000),
+            MATTER_ID VARCHAR2(4000),
+            CLIENT_ID VARCHAR2(4000)
+        )
+        """
+        cursor.execute(table_creation_query)
+        print("LAWCUS Billing Items table created successfully.")
+    else:
+        print("LAWCUS Billing Items table already exists.")
+
+
+def insert_activity_billing_items_into_table(cursor, billing_items_data):
+    """
+    Insert LAWOCUS Billing Items data into the Oracle database.
+
+    Modify the insert query based on your specific requirements.
+    """
+    insert_query = """
+    INSERT INTO LAWCUS_ACTIVITY_BILLING_ITEMS (
+        BILLING_ITEM_ID, START_DATE, END_DATE, ITEMS, USER_ID, PRACTICE_ID, IS_INVOICED,
+        MATTER_ID, CLIENT_ID
+    ) VALUES (
+        :id, :start_date, :end_date, :items, :user_id, :practice_id, :is_invoiced,
+        :matter_id, :client_id
+    )
+    """
+
+    for billing_item in billing_items_data.get("list", []):
+        cursor.execute(
+            insert_query,
+            {
+                "id": billing_item.get("id"),
+                "start_date": billing_item.get("start_date"),
+                "end_date": billing_item.get("end_date"),
+                "items": billing_item.get("items"),
+                "user_id": billing_item.get("user_id"),
+                "practice_id": billing_item.get("practice_id"),
+                "is_invoiced": billing_item.get("is_invoiced"),
+                "matter_id": billing_item.get("matter_id"),
+                "client_id": billing_item.get("client_id"),
+            },
+        )
+
+    print("LAWCUS Billing Items data inserted into the table successfully.")

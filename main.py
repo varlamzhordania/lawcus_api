@@ -9,6 +9,22 @@ from interactions import create_interactions_table, insert_interactions_into_tab
 from leads import create_leads_table, insert_leads_into_table
 from matters import create_matters_table, insert_matters_into_table
 from tasks import create_tasks_table, insert_tasks_into_table
+from activities import create_activity_category_table, create_activity_flat_fees_table, \
+    insert_activity_flat_fees_into_table, insert_activity_time_entries_into_table, create_activity_time_entry_table, \
+    create_activity_expenses_table, insert_activity_category_into_table, insert_activity_expenses_into_table, \
+    insert_activity_billing_items_into_table, create_activity_billing_items_table
+from users import create_users_me_table, create_users_team_table, create_users_matters_table, \
+    insert_users_matters_into_table, insert_users_me_into_table, create_users_contacts_table, \
+    create_users_teammates_table, insert_users_teammates_into_table, insert_users_contacts_into_table, \
+    insert_users_team_into_table
+from reports import create_reports_matters_info_table, insert_reports_matters_info_into_table, \
+    insert_reports_accounts_receivable_into_table, create_reports_client_trust_table, create_reports_time_entries_table, \
+    insert_reports_client_trust_into_table, insert_reports_matter_balance_into_table, \
+    insert_reports_payment_collected_into_table, create_reports_client_ledger_table, \
+    insert_reports_invoice_history_into_table, create_reports_accounts_receivable_table, \
+    insert_reports_time_entries_into_table, create_reports_trust_ledger_table, insert_reports_client_ledger_into_table, \
+    create_reports_payment_collected_table, create_reports_invoice_history_table, create_reports_matter_balance_table, \
+    create_reports_revenue_table, insert_reports_revenue_into_table, insert_reports_trust_ledger_into_table
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -83,13 +99,33 @@ def get_api_token():
     pass
 
 
-def create_all_tables():
-    create_contact_table(oracle_cursor)
-    create_matters_table(oracle_cursor)
-    create_leads_table(oracle_cursor)
-    create_interactions_table(oracle_cursor)
-    create_tasks_table(oracle_cursor)
-    create_accounts_table(oracle_cursor)
+def create_all_tables(cursor):
+    create_contact_table(cursor)
+    create_matters_table(cursor)
+    create_leads_table(cursor)
+    create_interactions_table(cursor)
+    create_tasks_table(cursor)
+    create_accounts_table(cursor)
+    create_activity_category_table(cursor)
+    create_activity_flat_fees_table(cursor)
+    create_activity_time_entry_table(cursor)
+    create_activity_expenses_table(cursor)
+    create_activity_billing_items_table(cursor)
+    create_users_me_table(cursor)
+    create_users_team_table(cursor)
+    create_users_matters_table(cursor)
+    create_users_contacts_table(cursor)
+    create_users_teammates_table(cursor)
+    create_reports_matters_info_table(cursor)
+    create_reports_client_trust_table(cursor)
+    create_reports_time_entries_table(cursor)
+    create_reports_client_ledger_table(cursor)
+    create_reports_accounts_receivable_table(cursor)
+    create_reports_trust_ledger_table(cursor)
+    create_reports_payment_collected_table(cursor)
+    create_reports_invoice_history_table(cursor)
+    create_reports_matter_balance_table(cursor)
+    create_reports_revenue_table(cursor)
 
 
 if __name__ == "__main__":
@@ -154,7 +190,7 @@ if __name__ == "__main__":
     #         create_accounts_table(oracle_cursor)
     #         insert_accounts_into_table(oracle_cursor, endpoint_data)
 
-    create_all_tables()
+    create_all_tables(oracle_cursor)
 
     # Close the database cursor when done
     oracle_cursor.close()
