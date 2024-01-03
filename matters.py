@@ -1,4 +1,4 @@
-from utils import table_exists
+from utils import table_exists, add_prefix_to_keys
 
 
 def create_matters_table(cursor):
@@ -87,7 +87,7 @@ def insert_matters_into_table(cursor, matters):
     insert_query = """
     INSERT INTO LAWCUS_MATTERS (
         MATTER_ID, UUID, COLOR_CODE, TAGS, CREATED_BY, CLOSE_DATE, NAME, POSITION,
-        STAGE_ID, IS_PRIVATE, PRACTICE, DISPLAY_NUMBER, RATES, NUMBER, DESCRIPTION,
+        STAGE_ID, IS_PRIVATE, PRACTICE, DISPLAY_NUMBER, RATES, NUMBERS, DESCRIPTION,
         STATUS, CLOSED_AT, LEAD_CREATED_AT, NOT_HIRE_AT, BILLING_TYPE, OPEN_DATE,
         DUE_DATE, STAGE_POSITION, ARCHIVED, STAGENAME, LOCATION, LOCATION_ID,
         RATE, ESTIMATED_COST, SETTLEMENT_AMOUNT, BILLING_ATTORNEY_ID,
@@ -99,21 +99,90 @@ def insert_matters_into_table(cursor, matters):
         WORKFLOW_ID, CLIENT_ID, EVERGREEN_RETAINER_AMOUNT, IS_USE_EVERGREEN_RETAINER,
         LAST_CONTACTED_AT, WORKFLOWNAME, ASSIGNID, LAWCUS_URL
     ) VALUES (
-        :id, :uuid, :color_code, :tags, :created_by, :close_date, :name, :position,
-        :stage_id, :is_private, :practice, :display_number, :rates, :number, :description,
-        :status, :closed_at, :lead_created_at, :not_hire_at, :billing_type, :open_date,
-        :due_date, :stage_position, :archived, :stagename, :location, :location_id,
-        :rate, :estimated_cost, :settlement_amount, :billing_attorney_id,
-        :not_hire_reason, :not_hire_note, :practice_name, :client_reference_number,
-        :converted_at, :integration, :box_folder_id, :box_shared_link,
-        :originating_timekeeper_id, :responsible_attorney_id, :google_drive_folder_id,
-        :one_drive_folder_id, :starred, :document_count, :comments_count,
-        :completed_tasks_count, :uncompleted_tasks_count, :relations, :team_id,
-        :workflow_id, :client_id, :evergreen_retainer_amount, :is_use_evergreen_retainer,
-        :last_contacted_at, :workflowname, :assignId, :lawcus_url
+        :my_id, :my_uuid, :my_color_code, :my_tags, :my_created_by, :my_close_date, :my_name, :my_position,
+        :my_stage_id, :my_is_private, :my_practice, :my_display_number, :my_rates, :my_number, :my_description,
+        :my_status, :my_closed_at, :my_lead_created_at, :my_not_hire_at, :my_billing_type, :my_open_date,
+        :my_due_date, :my_stage_position, :my_archived, :my_stagename, :my_location, :my_location_id,
+        :my_rate, :my_estimated_cost, :my_settlement_amount, :my_billing_attorney_id,
+        :my_not_hire_reason, :my_not_hire_note, :my_practice_name, :my_client_reference_number,
+        :my_converted_at, :my_integration, :my_box_folder_id, :my_box_shared_link,
+        :my_originating_timekeeper_id, :my_responsible_attorney_id, :my_google_drive_folder_id,
+        :my_one_drive_folder_id, :my_starred, :my_document_count, :my_comments_count,
+        :my_completed_tasks_count, :my_uncompleted_tasks_count, :my_relations, :my_team_id,
+        :my_workflow_id, :my_client_id, :my_evergreen_retainer_amount, :my_is_use_evergreen_retainer,
+        :my_last_contacted_at, :my_workflowname, :my_assignId, :my_lawcus_url
     )
     """
 
     for matter in matters:
-        cursor.execute(insert_query, matter)
+        prefixed_content = add_prefix_to_keys(matter)
+
+        # Convert lists to a string joined by ';;'
+        for key, value in prefixed_content.items():
+            if isinstance(value, list):
+                prefixed_content[key] = ';;'.join(map(str, value))
+
+        cursor.execute(
+            insert_query,
+            my_id=prefixed_content.get("my_id"),
+            my_uuid=prefixed_content.get("my_uuid"),
+            my_color_code=prefixed_content.get("my_color_code"),
+            my_tags=prefixed_content.get("my_tags"),
+            my_created_by=prefixed_content.get("my_created_by"),
+            my_close_date=prefixed_content.get("my_close_date"),
+            my_name=prefixed_content.get("my_name"),
+            my_position=prefixed_content.get("my_position"),
+            my_stage_id=prefixed_content.get("my_stage_id"),
+            my_is_private=prefixed_content.get("my_is_private"),
+            my_practice=prefixed_content.get("my_practice"),
+            my_display_number=prefixed_content.get("my_display_number"),
+            my_rates=prefixed_content.get("my_rates"),
+            my_number=prefixed_content.get("my_number"),
+            my_description=prefixed_content.get("my_description"),
+            my_status=prefixed_content.get("my_status"),
+            my_closed_at=prefixed_content.get("my_closed_at"),
+            my_lead_created_at=prefixed_content.get("my_lead_created_at"),
+            my_not_hire_at=prefixed_content.get("my_not_hire_at"),
+            my_billing_type=prefixed_content.get("my_billing_type"),
+            my_open_date=prefixed_content.get("my_open_date"),
+            my_due_date=prefixed_content.get("my_due_date"),
+            my_stage_position=prefixed_content.get("my_stage_position"),
+            my_archived=prefixed_content.get("my_archived"),
+            my_stagename=prefixed_content.get("my_stagename"),
+            my_location=prefixed_content.get("my_location"),
+            my_location_id=prefixed_content.get("my_location_id"),
+            my_rate=prefixed_content.get("my_rate"),
+            my_estimated_cost=prefixed_content.get("my_estimated_cost"),
+            my_settlement_amount=prefixed_content.get("my_settlement_amount"),
+            my_billing_attorney_id=prefixed_content.get("my_billing_attorney_id"),
+            my_not_hire_reason=prefixed_content.get("my_not_hire_reason"),
+            my_not_hire_note=prefixed_content.get("my_not_hire_note"),
+            my_practice_name=prefixed_content.get("my_practice_name"),
+            my_client_reference_number=prefixed_content.get("my_client_reference_number"),
+            my_converted_at=prefixed_content.get("my_converted_at"),
+            my_integration=prefixed_content.get("my_integration"),
+            my_box_folder_id=prefixed_content.get("my_box_folder_id"),
+            my_box_shared_link=prefixed_content.get("my_box_shared_link"),
+            my_originating_timekeeper_id=prefixed_content.get("my_originating_timekeeper_id"),
+            my_responsible_attorney_id=prefixed_content.get("my_responsible_attorney_id"),
+            my_google_drive_folder_id=prefixed_content.get("my_google_drive_folder_id"),
+            my_one_drive_folder_id=prefixed_content.get("my_one_drive_folder_id"),
+            my_starred=prefixed_content.get("my_starred"),
+            my_document_count=prefixed_content.get("my_document_count"),
+            my_comments_count=prefixed_content.get("my_comments_count"),
+            my_completed_tasks_count=prefixed_content.get("my_completed_tasks_count"),
+            my_uncompleted_tasks_count=prefixed_content.get("my_uncompleted_tasks_count"),
+            my_relations=prefixed_content.get("my_relations"),
+            my_team_id=prefixed_content.get("my_team_id"),
+            my_workflow_id=prefixed_content.get("my_workflow_id"),
+            my_client_id=prefixed_content.get("my_client_id"),
+            my_evergreen_retainer_amount=prefixed_content.get("my_evergreen_retainer_amount"),
+            my_is_use_evergreen_retainer=prefixed_content.get("my_is_use_evergreen_retainer"),
+            my_last_contacted_at=prefixed_content.get("my_last_contacted_at"),
+            my_workflowname=prefixed_content.get("my_workflowname"),
+            my_assignId=prefixed_content.get("my_assignId"),
+            my_lawcus_url=prefixed_content.get("my_lawcus_url"),
+        )
+    cursor.connection.commit()
     print("Matters inserted into the table successfully.")
+

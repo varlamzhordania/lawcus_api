@@ -1,4 +1,4 @@
-from utils import table_exists
+from utils import table_exists, add_prefix_to_keys
 
 
 def create_activity_time_entry_table(cursor):
@@ -53,15 +53,40 @@ def insert_activity_time_entries_into_table(cursor, time_entries):
         MATTER_ID, PAYMENT_DATE, ACTIVITY_ID, ACTIVITY_TASK_ID, REAL_TIMESTAMP,
         MATTER_NAME, MATTER_UUID, CLIENT_ID
     ) VALUES (
-        :id, :date, :description, :timestamp,
-        :rate, :total,:created_at,:updated_at, :user_id, :created_by,
-        :team_id, :invoice_id, :matter_id, :payment_date, :activity_id,
-        :activity_task_id, :real_timestamp, :mattername, :matteruuid, :client_id
+        :my_id, :my_date, :my_description, :my_timestamp,
+        :my_rate, :my_total, :my_created_at, :my_updated_at, :my_user_id, 
+        :my_created_by, :my_team_id, :my_invoice_id, :my_matter_id, 
+        :my_payment_date, :my_activity_id, :my_activity_task_id, 
+        :my_real_timestamp, :my_mattername, :my_matteruuid, :my_client_id
     )
     """
 
     for entry in time_entries:
-        cursor.execute(insert_query, entry)
+        prefixed_content = add_prefix_to_keys(entry)
+        cursor.execute(
+            insert_query,
+            my_id=prefixed_content.get("my_id"),
+            my_date=prefixed_content.get("my_date"),
+            my_description=prefixed_content.get("my_description"),
+            my_timestamp=prefixed_content.get("my_timestamp"),
+            my_rate=prefixed_content.get("my_rate"),
+            my_total=prefixed_content.get("my_total"),
+            my_created_at=prefixed_content.get("my_created_at"),
+            my_updated_at=prefixed_content.get("my_updated_at"),
+            my_user_id=prefixed_content.get("my_user_id"),
+            my_created_by=prefixed_content.get("my_created_by"),
+            my_team_id=prefixed_content.get("my_team_id"),
+            my_invoice_id=prefixed_content.get("my_invoice_id"),
+            my_matter_id=prefixed_content.get("my_matter_id"),
+            my_payment_date=prefixed_content.get("my_payment_date"),
+            my_activity_id=prefixed_content.get("my_activity_id"),
+            my_activity_task_id=prefixed_content.get("my_activity_task_id"),
+            my_real_timestamp=prefixed_content.get("my_real_timestamp"),
+            my_mattername=prefixed_content.get("my_mattername"),
+            my_matteruuid=prefixed_content.get("my_matteruuid"),
+            my_client_id=prefixed_content.get("my_client_id")
+        )
+    cursor.connection.commit()
     print("Time Entries inserted into the table successfully.")
 
 
@@ -115,16 +140,41 @@ def insert_activity_expenses_into_table(cursor, expenses):
         CREATED_AT, UPDATED_AT, USER_ID, CREATED_BY, TEAM_ID, INVOICE_ID,
         MATTER_ID, PAYMENT_DATE, FILES, ACTIVITY_ID, MATTER_NAME, MATTER_UUID
     ) VALUES (
-        :id, :date, :public_note,
-        :private_note, :rate, :quantity, :total,:created_at,
-        :updated_at, :user_id, :created_by,
-        :team_id, :invoice_id, :matter_id, :payment_date, :files, :activity_id,
-        :mattername, :matteruuid
+        :my_id, :my_date, :my_public_note,
+        :my_private_note, :my_rate, :my_quantity, :my_total, :my_created_at,
+        :my_updated_at, :my_user_id, :my_created_by,
+        :my_team_id, :my_invoice_id, :my_matter_id, :my_payment_date, 
+        :my_files, :my_activity_id, :my_mattername, :my_matteruuid
     )
     """
 
     for expense in expenses:
-        cursor.execute(insert_query, expense)
+        prefixed_content = add_prefix_to_keys(expense)
+
+        # Ensure that parameter names match the bind variables in the query
+        cursor.execute(
+            insert_query,
+            my_id=prefixed_content.get("my_id"),
+            my_date=prefixed_content.get("my_date"),
+            my_public_note=prefixed_content.get("my_public_note"),
+            my_private_note=prefixed_content.get("my_private_note"),
+            my_rate=prefixed_content.get("my_rate"),
+            my_quantity=prefixed_content.get("my_quantity"),
+            my_total=prefixed_content.get("my_total"),
+            my_created_at=prefixed_content.get("my_created_at"),
+            my_updated_at=prefixed_content.get("my_updated_at"),
+            my_user_id=prefixed_content.get("my_user_id"),
+            my_created_by=prefixed_content.get("my_created_by"),
+            my_team_id=prefixed_content.get("my_team_id"),
+            my_invoice_id=prefixed_content.get("my_invoice_id"),
+            my_matter_id=prefixed_content.get("my_matter_id"),
+            my_payment_date=prefixed_content.get("my_payment_date"),
+            my_files=prefixed_content.get("my_files"),
+            my_activity_id=prefixed_content.get("my_activity_id"),
+            my_mattername=prefixed_content.get("my_mattername"),
+            my_matteruuid=prefixed_content.get("my_matteruuid")
+        )
+    cursor.connection.commit()
     print("Expenses inserted into the table successfully.")
 
 
@@ -177,16 +227,39 @@ def insert_activity_flat_fees_into_table(cursor, flat_fees):
         USER_ID, MATTER_ID, INVOICE_ID, ACTIVITY_ID, CREATED_BY, TEAM_ID,
         CREATED_AT, UPDATED_AT, ACTIVITY_TASK_ID, MATTER_NAME, MATTER_UUID
     ) VALUES (
-        :id, :date, :description,
-        :private_note, :rate, :total, :quantity, :user_id, :matter_id,
-        :invoice_id, :activity_id, :created_by, :team_id, :created_at,
-        :updated_at, :activity_task_id,
-        :mattername, :matteruuid
+        :my_id, :my_date, :my_description,
+        :my_private_note, :my_rate, :my_total, :my_quantity, :my_user_id,
+        :my_matter_id, :my_invoice_id, :my_activity_id, :my_created_by, 
+        :my_team_id, :my_created_at, :my_updated_at, :my_activity_task_id,
+        :my_mattername, :my_matteruuid
     )
     """
 
     for flat_fee in flat_fees:
-        cursor.execute(insert_query, flat_fee)
+        prefixed_content = add_prefix_to_keys(flat_fee)
+        # Ensure that parameter names match the bind variables in the query
+        cursor.execute(
+            insert_query,
+            my_id=prefixed_content.get("my_id"),
+            my_date=prefixed_content.get("my_date"),
+            my_description=prefixed_content.get("my_description"),
+            my_private_note=prefixed_content.get("my_private_note"),
+            my_rate=prefixed_content.get("my_rate"),
+            my_total=prefixed_content.get("my_total"),
+            my_quantity=prefixed_content.get("my_quantity"),
+            my_user_id=prefixed_content.get("my_user_id"),
+            my_matter_id=prefixed_content.get("my_matter_id"),
+            my_invoice_id=prefixed_content.get("my_invoice_id"),
+            my_activity_id=prefixed_content.get("my_activity_id"),
+            my_created_by=prefixed_content.get("my_created_by"),
+            my_team_id=prefixed_content.get("my_team_id"),
+            my_created_at=prefixed_content.get("my_created_at"),
+            my_updated_at=prefixed_content.get("my_updated_at"),
+            my_activity_task_id=prefixed_content.get("my_activity_task_id"),
+            my_mattername=prefixed_content.get("my_mattername"),
+            my_matteruuid=prefixed_content.get("my_matteruuid")
+        )
+    cursor.connection.commit()
     print("Flat Fees inserted into the table successfully.")
 
 
@@ -226,12 +299,25 @@ def insert_activity_category_into_table(cursor, activity_categories):
     INSERT INTO LAWCUS_ACTIVITY_CATEGORY (
         ACTIVITY_CATEGORY_ID, NAME, RATE, TEAM_ID, CREATED_AT, UPDATED_AT, DESCRIPTION
     ) VALUES (
-        :id, :name, :rate, :team_id,:created_at,:updated_at, :description
+        :my_id, :my_name, :my_rate, :my_team_id, :my_created_at, :my_updated_at, :my_description
     )
     """
 
     for activity_category in activity_categories:
-        cursor.execute(insert_query, activity_category)
+        prefixed_content = add_prefix_to_keys(activity_category)
+        # Ensure that parameter names match the bind variables in the query
+        cursor.execute(
+            insert_query,
+            my_id=prefixed_content.get("my_id"),
+            my_name=prefixed_content.get("my_name"),
+            my_rate=prefixed_content.get("my_rate"),
+            my_team_id=prefixed_content.get("my_team_id"),
+            my_created_at=prefixed_content.get("my_created_at"),
+            my_updated_at=prefixed_content.get("my_updated_at"),
+            my_description=prefixed_content.get("my_description")
+        )
+
+    cursor.connection.commit()
     print("Activity Categories inserted into the table successfully.")
 
 

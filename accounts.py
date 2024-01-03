@@ -1,4 +1,4 @@
-from utils import table_exists
+from utils import table_exists, add_prefix_to_keys
 
 
 def create_accounts_table(cursor):
@@ -48,12 +48,34 @@ def insert_accounts_into_table(cursor, accounts):
         NUMBERS, TRANSIT_NUMBER, SWIFT, CURRENCY, BALANCE, CREATED_BY,
         TEAM_ID, INTEGRATION_TYPE, CONNECTED_WITH, IS_DEFAULT
     ) VALUES (
-        :id, :account_type, :name, :holder, :institution, :domicile_branch,
-        :number, :transit_number, :swift, :currency, :balance, :created_by,
-        :team_id, :integration_type, :connected_with, :is_default
+        :my_id, :my_account_type, :my_name, :my_holder, :my_institution, :my_domicile_branch,
+        :my_number, :my_transit_number, :my_swift, :my_currency, :my_balance, :my_created_by,
+        :my_team_id, :my_integration_type, :my_connected_with, :my_is_default
     )
     """
 
     for account in accounts:
-        cursor.execute(insert_query, account)
+        prefixed_content = add_prefix_to_keys(account)
+
+        cursor.execute(
+            insert_query,
+            my_id=prefixed_content.get("my_id"),
+            my_account_type=prefixed_content.get("my_account_type"),
+            my_name=prefixed_content.get("my_name"),
+            my_holder=prefixed_content.get("my_holder"),
+            my_institution=prefixed_content.get("my_institution"),
+            my_domicile_branch=prefixed_content.get("my_domicile_branch"),
+            my_number=prefixed_content.get("my_number"),
+            my_transit_number=prefixed_content.get("my_transit_number"),
+            my_swift=prefixed_content.get("my_swift"),
+            my_currency=prefixed_content.get("my_currency"),
+            my_balance=prefixed_content.get("my_balance"),
+            my_created_by=prefixed_content.get("my_created_by"),
+            my_team_id=prefixed_content.get("my_team_id"),
+            my_integration_type=prefixed_content.get("my_integration_type"),
+            my_connected_with=prefixed_content.get("my_connected_with"),
+            my_is_default=prefixed_content.get("my_is_default")
+        )
+
+    cursor.connection.commit()
     print("Accounts inserted into the table successfully.")

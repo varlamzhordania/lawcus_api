@@ -41,4 +41,6 @@ def insert_leads_into_table(cursor, leads):
 
     for lead in leads:
         cursor.execute(insert_query, lead)
+
+    cursor.connection.commit()
     print("Leads inserted into the table successfully.")

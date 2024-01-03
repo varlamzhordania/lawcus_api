@@ -1,4 +1,5 @@
-from utils import table_exists
+from utils import table_exists, add_prefix_to_keys
+import json
 
 
 def create_tasks_table(cursor):
@@ -49,13 +50,43 @@ def insert_tasks_into_table(cursor, tasks):
         CREATED_BY, MATTER_ID, DUE_TYPE, DUE_SETTINGS, IS_PRIVATE, REPEAT, TAGS,
         SORT_FIELD, SUB_TASKS_COUNT, ASSIGN_ID
     ) VALUES (
-        :id, :item_id, :name, :due_date,:start_date, :is_completed,
-        :is_custom_time, :created_by, :matter_id, :due_type, :due_settings,
-        :is_private, :repeat, :tags,:sort_field,
-        :sub_tasks_count, :assign_id
+        :my_id, :my_item_id, :my_name, :my_due_date, :my_start_date, :my_is_completed,
+        :my_is_custom_time, :my_created_by, :my_matter_id, :my_due_type, :my_due_settings,
+        :my_is_private, :my_repeat, :my_tags, :my_sort_field,
+        :my_sub_tasks_count, :my_assign_id
     )
     """
 
     for task in tasks:
-        cursor.execute(insert_query, task)
+        prefixed_content = add_prefix_to_keys(task)
+
+        # Ensure that parameter names match the bind variables in the query
+
+        # Convert lists to a string joined by ';;'
+        for key, value in prefixed_content.items():
+            if isinstance(value, list):
+                prefixed_content[key] = ';;'.join(map(str, value))
+
+        cursor.execute(
+            insert_query,
+            my_id=prefixed_content.get("my_id"),
+            my_item_id=prefixed_content.get("my_item_id"),
+            my_name=prefixed_content.get("my_name"),
+            my_due_date=prefixed_content.get("my_due_date"),
+            my_start_date=prefixed_content.get("my_start_date"),
+            my_is_completed=prefixed_content.get("my_is_completed"),
+            my_is_custom_time=prefixed_content.get("my_is_custom_time"),
+            my_created_by=prefixed_content.get("my_created_by"),
+            my_matter_id=prefixed_content.get("my_matter_id"),
+            my_due_type=prefixed_content.get("my_due_type"),
+            my_due_settings=json.dumps(prefixed_content.get("my_due_settings")),
+            my_is_private=prefixed_content.get("my_is_private"),
+            my_repeat=prefixed_content.get("my_repeat"),
+            my_tags=prefixed_content.get("my_tags"),
+            my_sort_field=prefixed_content.get("my_sort_field"),
+            my_sub_tasks_count=prefixed_content.get("my_sub_tasks_count"),
+            my_assign_id=prefixed_content.get("my_assign_id")
+        )
+
+    cursor.connection.commit()
     print("Tasks inserted into the table successfully.")

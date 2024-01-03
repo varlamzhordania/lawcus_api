@@ -1,4 +1,4 @@
-from utils import table_exists
+from utils import table_exists, add_prefix_to_keys
 
 
 def create_users_me_table(cursor):
@@ -60,6 +60,7 @@ def insert_users_me_into_table(cursor, users_me_data):
         },
     )
 
+    cursor.connection.commit()
     print("LAWCUS Users Me data inserted into the table successfully.")
 
 
@@ -122,7 +123,7 @@ def insert_users_teammates_into_table(cursor, teammates_data):
                 "role_name": teammate.get("role_name"),
             },
         )
-
+    cursor.connection.commit()
     print("LAWCUS Users Teammates data inserted into the table successfully.")
 
 
@@ -192,7 +193,7 @@ def insert_users_team_into_table(cursor, team_data):
             "support_email": team_data.get("support_email"),
         },
     )
-
+    cursor.connection.commit()
     print("LAWCUS Users Team data inserted into the table successfully.")
 
 
@@ -261,54 +262,60 @@ def insert_users_contacts_into_table(cursor, contacts_data):
         PREFIX, GENDER, DATE_OF_BIRTHDAY, NOTE, ADDRESSES, PHONE, PHONES, IS_LEAD,
         CUSTOM_FIELDS, COMPANY_ID, ASSOCIATED_USER_ID, LAST_CONTACTED_AT, IS_CLIENT
     ) VALUES (
-        :id, :uuid, :name, :first_name, :middle_name, :last_name, :source, :type,
-        :email, :emails, :avatar, :street, :city, :state, :zip, :country, :number,
-        :tags, :source_id, :referred_by, :prefix, :gender, :date_of_birthday, :note,
-        :addresses, :phone, :phones, :is_lead, :custom_fields, :company_id,
-        :associated_user_id, :last_contacted_at, :is_client
+        :my_id, :my_uuid, :my_name, :my_first_name, :my_middle_name, :my_last_name,
+        :my_source, :my_type, :my_email, :my_emails, :my_avatar, :my_street, :my_city,
+        :my_state, :my_zip, :my_country, :my_number, :my_tags, :my_source_id, :my_referred_by,
+        :my_prefix, :my_gender, :my_date_of_birthday, :my_note, :my_addresses, :my_phone,
+        :my_phones, :my_is_lead, :my_custom_fields, :my_company_id, :my_associated_user_id,
+        :my_last_contacted_at, :my_is_client
     )
     """
 
     for contact in contacts_data:
+
+        # Convert lists to a string joined by ';;'
+        for key, value in contact.items():
+            if isinstance(value, list):
+                contact[key] = ';;'.join(map(str, value))
+
         cursor.execute(
             insert_query,
-            {
-                "id": contact.get("id"),
-                "uuid": contact.get("uuid"),
-                "name": contact.get("name"),
-                "first_name": contact.get("first_name"),
-                "middle_name": contact.get("middle_name"),
-                "last_name": contact.get("last_name"),
-                "source": contact.get("source"),
-                "type": contact.get("type"),
-                "email": contact.get("email"),
-                "emails": contact.get("emails"),
-                "avatar": contact.get("avatar"),
-                "street": contact.get("street"),
-                "city": contact.get("city"),
-                "state": contact.get("state"),
-                "zip": contact.get("zip"),
-                "country": contact.get("country"),
-                "number": contact.get("number"),
-                "tags": contact.get("tags"),
-                "source_id": contact.get("source_id"),
-                "referred_by": contact.get("referred_by"),
-                "prefix": contact.get("prefix"),
-                "gender": contact.get("gender"),
-                "date_of_birthday": contact.get("date_of_birthday"),
-                "note": contact.get("note"),
-                "addresses": contact.get("addresses"),
-                "phone": contact.get("phone"),
-                "phones": contact.get("phones"),
-                "is_lead": contact.get("is_lead"),
-                "custom_fields": contact.get("custom_fields"),
-                "company_id": contact.get("company_id"),
-                "associated_user_id": contact.get("associated_user_id"),
-                "last_contacted_at": contact.get("last_contacted_at"),
-                "is_client": contact.get("is_client"),
-            },
+            my_id=contact.get("id"),
+            my_uuid=contact.get("uuid"),
+            my_name=contact.get("name"),
+            my_first_name=contact.get("first_name"),
+            my_middle_name=contact.get("middle_name"),
+            my_last_name=contact.get("last_name"),
+            my_source=contact.get("source"),
+            my_type=contact.get("type"),
+            my_email=contact.get("email"),
+            my_emails=contact.get("emails"),
+            my_avatar=contact.get("avatar"),
+            my_street=contact.get("street"),
+            my_city=contact.get("city"),
+            my_state=contact.get("state"),
+            my_zip=contact.get("zip"),
+            my_country=contact.get("country"),
+            my_number=contact.get("number"),
+            my_tags=contact.get("tags"),
+            my_source_id=contact.get("source_id"),
+            my_referred_by=contact.get("referred_by"),
+            my_prefix=contact.get("prefix"),
+            my_gender=contact.get("gender"),
+            my_date_of_birthday=contact.get("date_of_birthday"),
+            my_note=contact.get("note"),
+            my_addresses=contact.get("addresses"),
+            my_phone=contact.get("phone"),
+            my_phones=contact.get("phones"),
+            my_is_lead=contact.get("is_lead"),
+            my_custom_fields=contact.get("custom_fields"),
+            my_company_id=contact.get("company_id"),
+            my_associated_user_id=contact.get("associated_user_id"),
+            my_last_contacted_at=contact.get("last_contacted_at"),
+            my_is_client=contact.get("is_client"),
         )
 
+    cursor.connection.commit()
     print("LAWCUS Users Contacts data inserted into the table successfully.")
 
 
@@ -400,74 +407,81 @@ def insert_users_matters_into_table(cursor, matters_data):
         COMPLETED_TASKS_COUNT, UNCOMPLETED_TASKS_COUNT, LAST_CONTACTED_AT,
         DOCUMENT_COUNT, LAWCUS_URL
     ) VALUES (
-        :id, :uuid, :tags, :color_code, :name, :position, :stage_id, :is_private,
-        :practice, :display_number, :rates, :number, :description, :status,
-        :closed_at, :billing_type, :open_date, :due_date, :stage_position, :stagename,
-        :rate, :originating_timekeeper_id, :responsible_attorney_id, :settlement_amount,
-        :billing_attorney_id, :created_by, :custom_fields, :lead_created_at, :location,
-        :location_id, :archived, :team_id, :workflow_id, :client_id, :client_referred_by,
-        :client_source_id, :estimated_cost, :task_due_date, :evergreen_retainer_amount,
-        :is_use_evergreen_retainer, :workflowname, :relations, :assignees, :assign_id,
-        :starred, :completed_tasks_count, :uncompleted_tasks_count, :last_contacted_at,
-        :document_count, :lawcus_url
+        :my_id, :my_uuid, :my_tags, :my_color_code, :my_name, :my_position, :my_stage_id,
+        :my_is_private, :my_practice, :my_display_number, :my_rates, :my_number, :my_description,
+        :my_status, :my_closed_at, :my_billing_type, :my_open_date, :my_due_date,
+        :my_stage_position, :my_stagename, :my_rate, :my_originating_timekeeper_id,
+        :my_responsible_attorney_id, :my_settlement_amount, :my_billing_attorney_id,
+        :my_created_by, :my_custom_fields, :my_lead_created_at, :my_location, :my_location_id,
+        :my_archived, :my_team_id, :my_workflow_id, :my_client_id, :my_client_referred_by,
+        :my_client_source_id, :my_estimated_cost, :my_task_due_date, :my_evergreen_retainer_amount,
+        :my_is_use_evergreen_retainer, :my_workflowname, :my_relations, :my_assignees,
+        :my_assign_id, :my_starred, :my_completed_tasks_count, :my_uncompleted_tasks_count,
+        :my_last_contacted_at, :my_document_count, :my_lawcus_url
     )
     """
 
     for matter in matters_data:
+
+        # Convert lists to a string joined by ';;'
+        for key, value in matter.items():
+            if isinstance(value, list):
+                matter[key] = ';;'.join(map(str, value))
+
         cursor.execute(
             insert_query,
-            {
-                "id": matter.get("id"),
-                "uuid": matter.get("uuid"),
-                "tags": matter.get("tags"),
-                "color_code": matter.get("color_code"),
-                "name": matter.get("name"),
-                "position": matter.get("position"),
-                "stage_id": matter.get("stage_id"),
-                "is_private": matter.get("is_private"),
-                "practice": matter.get("practice"),
-                "display_number": matter.get("display_number"),
-                "rates": matter.get("rates"),
-                "number": matter.get("number"),
-                "description": matter.get("description"),
-                "status": matter.get("status"),
-                "closed_at": matter.get("closed_at"),
-                "billing_type": matter.get("billing_type"),
-                "open_date": matter.get("open_date"),
-                "due_date": matter.get("due_date"),
-                "stage_position": matter.get("stage_position"),
-                "stagename": matter.get("stagename"),
-                "rate": matter.get("rate"),
-                "originating_timekeeper_id": matter.get("originating_timekeeper_id"),
-                "responsible_attorney_id": matter.get("responsible_attorney_id"),
-                "settlement_amount": matter.get("settlement_amount"),
-                "billing_attorney_id": matter.get("billing_attorney_id"),
-                "created_by": matter.get("created_by"),
-                "custom_fields": matter.get("custom_fields"),
-                "lead_created_at": matter.get("lead_created_at"),
-                "location": matter.get("location"),
-                "location_id": matter.get("location_id"),
-                "archived": matter.get("archived"),
-                "team_id": matter.get("team_id"),
-                "workflow_id": matter.get("workflow_id"),
-                "client_id": matter.get("client_id"),
-                "client_referred_by": matter.get("client_referred_by"),
-                "client_source_id": matter.get("client_source_id"),
-                "estimated_cost": matter.get("estimated_cost"),
-                "task_due_date": matter.get("task_due_date"),
-                "evergreen_retainer_amount": matter.get("evergreen_retainer_amount"),
-                "is_use_evergreen_retainer": matter.get("is_use_evergreen_retainer"),
-                "workflowname": matter.get("workflowname"),
-                "relations": matter.get("relations"),
-                "assignees": matter.get("assignees"),
-                "assign_id": matter.get("assignId"),
-                "starred": matter.get("starred"),
-                "completed_tasks_count": matter.get("completed_tasks_count"),
-                "uncompleted_tasks_count": matter.get("uncompleted_tasks_count"),
-                "last_contacted_at": matter.get("last_contacted_at"),
-                "document_count": matter.get("document_count"),
-                "lawcus_url": matter.get("lawcus_url"),
-            },
+            my_id=matter.get("id"),
+            my_uuid=matter.get("uuid"),
+            my_tags=matter.get("tags"),
+            my_color_code=matter.get("color_code"),
+            my_name=matter.get("name"),
+            my_position=matter.get("position"),
+            my_stage_id=matter.get("stage_id"),
+            my_is_private=matter.get("is_private"),
+            my_practice=matter.get("practice"),
+            my_display_number=matter.get("display_number"),
+            my_rates=matter.get("rates"),
+            my_number=matter.get("number"),
+            my_description=matter.get("description"),
+            my_status=matter.get("status"),
+            my_closed_at=matter.get("closed_at"),
+            my_billing_type=matter.get("billing_type"),
+            my_open_date=matter.get("open_date"),
+            my_due_date=matter.get("due_date"),
+            my_stage_position=matter.get("stage_position"),
+            my_stagename=matter.get("stagename"),
+            my_rate=matter.get("rate"),
+            my_originating_timekeeper_id=matter.get("originating_timekeeper_id"),
+            my_responsible_attorney_id=matter.get("responsible_attorney_id"),
+            my_settlement_amount=matter.get("settlement_amount"),
+            my_billing_attorney_id=matter.get("billing_attorney_id"),
+            my_created_by=matter.get("created_by"),
+            my_custom_fields=matter.get("custom_fields"),
+            my_lead_created_at=matter.get("lead_created_at"),
+            my_location=matter.get("location"),
+            my_location_id=matter.get("location_id"),
+            my_archived=matter.get("archived"),
+            my_team_id=matter.get("team_id"),
+            my_workflow_id=matter.get("workflow_id"),
+            my_client_id=matter.get("client_id"),
+            my_client_referred_by=matter.get("client_referred_by"),
+            my_client_source_id=matter.get("client_source_id"),
+            my_estimated_cost=matter.get("estimated_cost"),
+            my_task_due_date=matter.get("task_due_date"),
+            my_evergreen_retainer_amount=matter.get("evergreen_retainer_amount"),
+            my_is_use_evergreen_retainer=matter.get("is_use_evergreen_retainer"),
+            my_workflowname=matter.get("workflowname"),
+            my_relations=matter.get("relations"),
+            my_assignees=matter.get("assignees"),
+            my_assign_id=matter.get("assign_id"),
+            my_starred=matter.get("starred"),
+            my_completed_tasks_count=matter.get("completed_tasks_count"),
+            my_uncompleted_tasks_count=matter.get("uncompleted_tasks_count"),
+            my_last_contacted_at=matter.get("last_contacted_at"),
+            my_document_count=matter.get("document_count"),
+            my_lawcus_url=matter.get("lawcus_url"),
+
         )
 
+    cursor.connection.commit()
     print("LAWCUS Users Matters data inserted into the table successfully.")

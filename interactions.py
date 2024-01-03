@@ -1,4 +1,4 @@
-from utils import table_exists
+from utils import table_exists, add_prefix_to_keys
 
 
 def create_interactions_table(cursor):
@@ -15,7 +15,7 @@ def create_interactions_table(cursor):
             INTERACTION_ID VARCHAR2(4000),
             INTERACTION_DATE VARCHAR2(4000),
             SUBJECT VARCHAR2(4000),
-            BODY VARCHAR2(4000),
+            BODY CLOB,
             INTERACTION_TYPE VARCHAR2(4000),
             INTERACTION_TYPE_IN VARCHAR2(4000),
             MATTER_ID VARCHAR2(4000),
@@ -42,12 +42,29 @@ def insert_interactions_into_table(cursor, interactions):
         INTERACTION_ID, INTERACTION_DATE, SUBJECT, BODY, INTERACTION_TYPE, INTERACTION_TYPE_IN,
         MATTER_ID, CONTACT_ID, INVOICE_TIMEENTRIES_ID, CREATED_BY, CREATED_AT
     ) VALUES (
-        :id,:date, :subject, :body,
-        :type, :type_in, :matter_id, :contact_id, :invoice_timeentries_id,
-        :created_by,:created_at
+        :my_id, :my_date, :my_subject, :my_body,
+        :my_type, :my_type_in, :my_matter_id, :my_contact_id, :my_invoice_timeentries_id,
+        :my_created_by, :my_created_at
     )
     """
 
     for interaction in interactions:
-        cursor.execute(insert_query, interaction)
+        prefixed_content = add_prefix_to_keys(interaction)
+        # Ensure that parameter names match the bind variables in the query
+        cursor.execute(
+            insert_query,
+            my_id=prefixed_content.get("my_id"),
+            my_date=prefixed_content.get("my_date"),
+            my_subject=prefixed_content.get("my_subject"),
+            my_body=prefixed_content.get("my_body"),
+            my_type=prefixed_content.get("my_type"),
+            my_type_in=prefixed_content.get("my_type_in"),
+            my_matter_id=prefixed_content.get("my_matter_id"),
+            my_contact_id=prefixed_content.get("my_contact_id"),
+            my_invoice_timeentries_id=prefixed_content.get("my_invoice_timeentries_id"),
+            my_created_by=prefixed_content.get("my_created_by"),
+            my_created_at=prefixed_content.get("my_created_at")
+        )
+
+    cursor.connection.commit()
     print("Interactions inserted into the table successfully.")
