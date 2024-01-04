@@ -1,4 +1,5 @@
-from utils import table_exists, add_prefix_to_keys
+from utils import table_exists
+from logger import logger
 
 
 def create_interactions_table(cursor):
@@ -9,26 +10,29 @@ def create_interactions_table(cursor):
     """
     table_name = "LAWCUS_INTERACTIONS"
 
-    if not table_exists(cursor, table_name):
-        table_creation_query = """
-        CREATE TABLE LAWCUS_INTERACTIONS (
-            INTERACTION_ID VARCHAR2(4000),
-            INTERACTION_DATE VARCHAR2(4000),
-            SUBJECT VARCHAR2(4000),
-            BODY CLOB,
-            INTERACTION_TYPE VARCHAR2(4000),
-            INTERACTION_TYPE_IN VARCHAR2(4000),
-            MATTER_ID VARCHAR2(4000),
-            CONTACT_ID VARCHAR2(4000),
-            INVOICE_TIMEENTRIES_ID VARCHAR2(4000),
-            CREATED_BY VARCHAR2(4000),
-            CREATED_AT VARCHAR2(4000)
-        )
-        """
-        cursor.execute(table_creation_query)
-        print("Interactions table created successfully.")
-    else:
-        print("Interactions table already exists.")
+    try:
+        if not table_exists(cursor, table_name):
+            table_creation_query = """
+            CREATE TABLE LAWCUS_INTERACTIONS (
+                INTERACTION_ID VARCHAR2(4000),
+                INTERACTION_DATE VARCHAR2(4000),
+                SUBJECT VARCHAR2(4000),
+                BODY CLOB,
+                INTERACTION_TYPE VARCHAR2(4000),
+                INTERACTION_TYPE_IN VARCHAR2(4000),
+                MATTER_ID VARCHAR2(4000),
+                CONTACT_ID VARCHAR2(4000),
+                INVOICE_TIMEENTRIES_ID VARCHAR2(4000),
+                CREATED_BY VARCHAR2(4000),
+                CREATED_AT VARCHAR2(4000)
+            )
+            """
+            cursor.execute(table_creation_query)
+            logger.info("Interactions table created successfully.")
+        else:
+            logger.info("Interactions table already exists.")
+    except Exception as e:
+        logger.error(f"Error creating Interactions table: {e}")
 
 
 def insert_interactions_into_table(cursor, interactions):
@@ -48,23 +52,25 @@ def insert_interactions_into_table(cursor, interactions):
     )
     """
 
-    for interaction in interactions:
-        prefixed_content = add_prefix_to_keys(interaction)
-        # Ensure that parameter names match the bind variables in the query
-        cursor.execute(
-            insert_query,
-            my_id=prefixed_content.get("my_id"),
-            my_date=prefixed_content.get("my_date"),
-            my_subject=prefixed_content.get("my_subject"),
-            my_body=prefixed_content.get("my_body"),
-            my_type=prefixed_content.get("my_type"),
-            my_type_in=prefixed_content.get("my_type_in"),
-            my_matter_id=prefixed_content.get("my_matter_id"),
-            my_contact_id=prefixed_content.get("my_contact_id"),
-            my_invoice_timeentries_id=prefixed_content.get("my_invoice_timeentries_id"),
-            my_created_by=prefixed_content.get("my_created_by"),
-            my_created_at=prefixed_content.get("my_created_at")
-        )
+    try:
+        for interaction in interactions:
+            # Ensure that parameter names match the bind variables in the query
+            cursor.execute(
+                insert_query,
+                my_id=interaction.get("id"),
+                my_date=interaction.get("date"),
+                my_subject=interaction.get("subject"),
+                my_body=interaction.get("body"),
+                my_type=interaction.get("type"),
+                my_type_in=interaction.get("type_in"),
+                my_matter_id=interaction.get("matter_id"),
+                my_contact_id=interaction.get("contact_id"),
+                my_invoice_timeentries_id=interaction.get("invoice_timeentries_id"),
+                my_created_by=interaction.get("created_by"),
+                my_created_at=interaction.get("created_at")
+            )
 
-    cursor.connection.commit()
-    print("Interactions inserted into the table successfully.")
+        cursor.connection.commit()
+        logger.info("Interactions inserted into the table successfully.")
+    except Exception as e:
+        logger.error(f"Error inserting Interactions into the table: {e}")

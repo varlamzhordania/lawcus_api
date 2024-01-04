@@ -1,4 +1,5 @@
 import requests
+from logger import logger
 
 
 def table_exists(cursor, table_name):
@@ -13,6 +14,7 @@ def table_exists(cursor, table_name):
     cursor.execute(check_query)
     result = cursor.fetchone()
 
+    logger.info(f"Checking if table {table_name} exists.")
     return result[0] > 0
 
 
@@ -24,6 +26,8 @@ def add_prefix_to_keys(data, prefix='my_'):
     :param prefix: Prefix to be added to keys
     :return: Dictionary with modified keys
     """
+
+    logger.info(f"Added prefix '{prefix}' to keys in dictionary: {data}")
     return {f"{prefix}{key}": value for key, value in data.items()}
 
 
@@ -34,6 +38,8 @@ def convert_values_to_str(input_dict):
     :param input_dict: Input dictionary
     :return: Dictionary with all values converted to strings
     """
+
+    logger.info(f"Converted dictionary values to strings: {input_dict}")
     return {key: str(value) for key, value in input_dict.items()}
 
 
@@ -53,9 +59,9 @@ def truncate_table(cursor, table_name):
     try:
         cursor.execute(truncate_query)
         cursor.connection.commit()
-        print(f"Table {table_name} truncated successfully.")
+        logger.info(f"Table {table_name} truncated successfully.")
     except Exception as e:
-        print(f"Error truncating table {table_name}: {e}")
+        logger.error(f"Error truncating table {table_name}: {e}")
 
 
 def get_authorization_code_url(client_id, redirect_uri, state=''):
@@ -67,7 +73,9 @@ def get_authorization_code_url(client_id, redirect_uri, state=''):
     :param state: Optional state parameter
     :return: Authorization URL
     """
-    return f'https://auth.lawcus.com/auth?response_type=code&state={state}&client_id={client_id}&scope=&redirect_uri={redirect_uri}'
+    authorization_url = f'https://auth.lawcus.com/auth?response_type=code&state={state}&client_id={client_id}&scope=&redirect_uri={redirect_uri}'
+    logger.info(f"Generated authorization URL: {authorization_url}")
+    return authorization_url
 
 
 def make_token_request(token_url, data):
@@ -82,8 +90,11 @@ def make_token_request(token_url, data):
     response = requests.post(token_url, json=data, headers=headers)
 
     if response.status_code == 200:
-        return response.json()
+        token_data = response.json()
+        logger.info(f"Token request successful: {token_data}")
+        return token_data
     else:
+        logger.error(f"Token request failed with status code {response.status_code}")
         raise Exception(f"Token request failed with status code {response.status_code}")
 
 

@@ -1,6 +1,6 @@
 import json
-
-from utils import table_exists, add_prefix_to_keys
+from utils import table_exists
+from logger import logger
 
 
 def create_contact_table(cursor):
@@ -11,68 +11,71 @@ def create_contact_table(cursor):
     """
     table_name = "LAWCUS_CONTACTS"
 
-    if not table_exists(cursor, table_name):
-        table_creation_query = """
-        CREATE TABLE LAWCUS_CONTACTS (
-            CONTACT_ID VARCHAR2(4000),
-            CONTACT_TYPE VARCHAR2(4000),
-            NAME VARCHAR2(4000),
-            FIRST_NAME VARCHAR2(4000),
-            MIDDLE_NAME VARCHAR2(4000),
-            LAST_NAME VARCHAR2(4000),
-            TITLE VARCHAR2(4000),
-            EMAIL VARCHAR2(4000),
-            WEBSITE VARCHAR2(4000),
-            HOME_PHONE VARCHAR2(4000),
-            WORK_PHONE VARCHAR2(4000),
-            MOBILE VARCHAR2(4000),
-            FAX VARCHAR2(4000),
-            HOME_ADDRESS VARCHAR2(4000),
-            WORK_ADDRESS VARCHAR2(4000),
-            CREATED_BY VARCHAR2(4000),
-            CREATED_AT VARCHAR2(4000),
-            UPDATED_AT VARCHAR2(4000),
-            UUID VARCHAR2(4000),
-            AVATAR VARCHAR2(4000),
-            TEAM_ID VARCHAR2(4000),
-            COMPANY_ID VARCHAR2(4000),
-            CUSTOM_FIELDS VARCHAR2(4000),
-            INTEGRATION VARCHAR2(4000),
-            INTEGRATION_ID VARCHAR2(4000),
-            BOX_FOLDER_ID VARCHAR2(4000),
-            BOX_SHARED_LINK VARCHAR2(4000),
-            NUMBERS VARCHAR2(4000),
-            QUICKBOOKS_ID VARCHAR2(4000),
-            GOOGLE_DRIVE_FOLDER_ID VARCHAR2(4000),
-            ONE_DRIVE_FOLDER_ID VARCHAR2(4000),
-            ADDRESSES VARCHAR2(4000),
-            PHONES VARCHAR2(4000),
-            TAGS VARCHAR2(4000),
-            EMAILS VARCHAR2(4000),
-            PHONE VARCHAR2(4000),
-            STREET VARCHAR2(4000),
-            CITY VARCHAR2(4000),
-            STATE VARCHAR2(4000),
-            ZIP VARCHAR2(4000),
-            COUNTRY VARCHAR2(4000),
-            SOURCE VARCHAR2(4000),
-            SOURCE_ID VARCHAR2(4000),
-            REFERRED_BY VARCHAR2(4000),
-            REFERRED_BY_TYPE VARCHAR2(4000),
-            PREFIX VARCHAR2(4000),
-            GENDER VARCHAR2(4000),
-            DATE_OF_BIRTHDAY VARCHAR2(4000),
-            NOTE VARCHAR2(4000),
-            STREET2 VARCHAR2(4000),
-            IS_LEAD VARCHAR2(4000),
-            QUICKBOOKS_ERROR VARCHAR2(4000),
-            LEDES_CLIENT_ID VARCHAR2(4000)
-        )
-        """
-        cursor.execute(table_creation_query)
-        print("Contact table created successfully.")
-    else:
-        print("Contact table already exists.")
+    try:
+        if not table_exists(cursor, table_name):
+            table_creation_query = """
+            CREATE TABLE LAWCUS_CONTACTS (
+                CONTACT_ID VARCHAR2(4000),
+                CONTACT_TYPE VARCHAR2(4000),
+                NAME VARCHAR2(4000),
+                FIRST_NAME VARCHAR2(4000),
+                MIDDLE_NAME VARCHAR2(4000),
+                LAST_NAME VARCHAR2(4000),
+                TITLE VARCHAR2(4000),
+                EMAIL VARCHAR2(4000),
+                WEBSITE VARCHAR2(4000),
+                HOME_PHONE VARCHAR2(4000),
+                WORK_PHONE VARCHAR2(4000),
+                MOBILE VARCHAR2(4000),
+                FAX VARCHAR2(4000),
+                HOME_ADDRESS VARCHAR2(4000),
+                WORK_ADDRESS VARCHAR2(4000),
+                CREATED_BY VARCHAR2(4000),
+                CREATED_AT VARCHAR2(4000),
+                UPDATED_AT VARCHAR2(4000),
+                UUID VARCHAR2(4000),
+                AVATAR VARCHAR2(4000),
+                TEAM_ID VARCHAR2(4000),
+                COMPANY_ID VARCHAR2(4000),
+                CUSTOM_FIELDS VARCHAR2(4000),
+                INTEGRATION VARCHAR2(4000),
+                INTEGRATION_ID VARCHAR2(4000),
+                BOX_FOLDER_ID VARCHAR2(4000),
+                BOX_SHARED_LINK VARCHAR2(4000),
+                NUMBERS VARCHAR2(4000),
+                QUICKBOOKS_ID VARCHAR2(4000),
+                GOOGLE_DRIVE_FOLDER_ID VARCHAR2(4000),
+                ONE_DRIVE_FOLDER_ID VARCHAR2(4000),
+                ADDRESSES VARCHAR2(4000),
+                PHONES VARCHAR2(4000),
+                TAGS VARCHAR2(4000),
+                EMAILS VARCHAR2(4000),
+                PHONE VARCHAR2(4000),
+                STREET VARCHAR2(4000),
+                CITY VARCHAR2(4000),
+                STATE VARCHAR2(4000),
+                ZIP VARCHAR2(4000),
+                COUNTRY VARCHAR2(4000),
+                SOURCE VARCHAR2(4000),
+                SOURCE_ID VARCHAR2(4000),
+                REFERRED_BY VARCHAR2(4000),
+                REFERRED_BY_TYPE VARCHAR2(4000),
+                PREFIX VARCHAR2(4000),
+                GENDER VARCHAR2(4000),
+                DATE_OF_BIRTHDAY VARCHAR2(4000),
+                NOTE VARCHAR2(4000),
+                STREET2 VARCHAR2(4000),
+                IS_LEAD VARCHAR2(4000),
+                QUICKBOOKS_ERROR VARCHAR2(4000),
+                LEDES_CLIENT_ID VARCHAR2(4000)
+            )
+            """
+            cursor.execute(table_creation_query)
+            logger.info("Contact table created successfully.")
+        else:
+            logger.info("Contact table already exists.")
+    except Exception as e:
+        logger.error(f"Error creating contact table: {e}")
 
 
 def insert_contacts_into_table(cursor, contacts):
@@ -107,65 +110,67 @@ def insert_contacts_into_table(cursor, contacts):
         )
         """
 
-    for contact in contacts:
-        prefixed_contact = add_prefix_to_keys(contact)
-        # Execute the query with parameters
-        cursor.execute(
-            insert_query,
-            my_id=prefixed_contact.get("my_id"),
-            my_type=prefixed_contact.get("my_type"),
-            my_name=prefixed_contact.get("my_name"),
-            my_first_name=prefixed_contact.get("my_first_name"),
-            my_middle_name=prefixed_contact.get("my_middle_name"),
-            my_last_name=prefixed_contact.get("my_last_name"),
-            my_title=prefixed_contact.get("my_title"),
-            my_email=prefixed_contact.get("my_email"),
-            my_website=prefixed_contact.get("my_website"),
-            my_home_phone=prefixed_contact.get("my_home_phone"),
-            my_work_phone=prefixed_contact.get("my_work_phone"),
-            my_mobile=prefixed_contact.get("my_mobile"),
-            my_fax=prefixed_contact.get("my_fax"),
-            my_home_address=prefixed_contact.get("my_home_address"),
-            my_work_address=prefixed_contact.get("my_work_address"),
-            my_created_by=prefixed_contact.get("my_created_by"),
-            my_created_at=prefixed_contact.get("my_created_at"),
-            my_updated_at=prefixed_contact.get("my_updated_at"),
-            my_uuid=prefixed_contact.get("my_uuid"),
-            my_avatar=prefixed_contact.get("my_avatar"),
-            my_team_id=prefixed_contact.get("my_team_id"),
-            my_company_id=prefixed_contact.get("my_company_id"),
-            my_custom_fields=prefixed_contact.get("my_custom_fields"),
-            my_integration=prefixed_contact.get("my_integration"),
-            my_integration_id=prefixed_contact.get("my_integration_id"),
-            my_box_folder_id=prefixed_contact.get("my_box_folder_id"),
-            my_box_shared_link=prefixed_contact.get("my_box_shared_link"),
-            my_number=prefixed_contact.get("my_number"),
-            my_quickbooks_id=prefixed_contact.get("my_quickbooks_id"),
-            my_google_drive_folder_id=prefixed_contact.get("my_google_drive_folder_id"),
-            my_one_drive_folder_id=prefixed_contact.get("my_one_drive_folder_id"),
-            my_addresses=prefixed_contact.get("my_addresses"),
-            my_phones=prefixed_contact.get("my_phones"),
-            my_tags=prefixed_contact.get("my_tags"),
-            my_emails=prefixed_contact.get("my_emails"),
-            my_phone=prefixed_contact.get("my_phone"),
-            my_street=prefixed_contact.get("my_street"),
-            my_city=prefixed_contact.get("my_city"),
-            my_state=prefixed_contact.get("my_state"),
-            my_zip=prefixed_contact.get("my_zip"),
-            my_country=prefixed_contact.get("my_country"),
-            my_source=prefixed_contact.get("my_source"),
-            my_source_id=prefixed_contact.get("my_source_id"),
-            my_referred_by=prefixed_contact.get("my_referred_by"),
-            my_referred_by_type=prefixed_contact.get("my_referred_by_type"),
-            my_prefix=prefixed_contact.get("my_prefix"),
-            my_gender=prefixed_contact.get("my_gender"),
-            my_date_of_birthday=prefixed_contact.get("my_date_of_birthday"),
-            my_note=prefixed_contact.get("my_note"),
-            my_street2=prefixed_contact.get("my_street2"),
-            my_is_lead=prefixed_contact.get("my_is_lead"),
-            my_quickbooks_error=prefixed_contact.get("my_quickbooks_error"),
-            my_ledes_client_id=prefixed_contact.get("my_ledes_client_id")
-        )
+    try:
+        for contact in contacts:
+            # Execute the query with parameters
+            cursor.execute(
+                insert_query,
+                my_id=contact.get("id"),
+                my_type=contact.get("type"),
+                my_name=contact.get("name"),
+                my_first_name=contact.get("first_name"),
+                my_middle_name=contact.get("middle_name"),
+                my_last_name=contact.get("last_name"),
+                my_title=contact.get("title"),
+                my_email=contact.get("email"),
+                my_website=contact.get("website"),
+                my_home_phone=contact.get("home_phone"),
+                my_work_phone=contact.get("work_phone"),
+                my_mobile=contact.get("mobile"),
+                my_fax=contact.get("fax"),
+                my_home_address=contact.get("home_address"),
+                my_work_address=contact.get("work_address"),
+                my_created_by=contact.get("created_by"),
+                my_created_at=contact.get("created_at"),
+                my_updated_at=contact.get("updated_at"),
+                my_uuid=contact.get("uuid"),
+                my_avatar=contact.get("avatar"),
+                my_team_id=contact.get("team_id"),
+                my_company_id=contact.get("company_id"),
+                my_custom_fields=contact.get("custom_fields"),
+                my_integration=contact.get("integration"),
+                my_integration_id=contact.get("integration_id"),
+                my_box_folder_id=contact.get("box_folder_id"),
+                my_box_shared_link=contact.get("box_shared_link"),
+                my_number=contact.get("number"),
+                my_quickbooks_id=contact.get("quickbooks_id"),
+                my_google_drive_folder_id=contact.get("google_drive_folder_id"),
+                my_one_drive_folder_id=contact.get("one_drive_folder_id"),
+                my_addresses=contact.get("addresses"),
+                my_phones=contact.get("phones"),
+                my_tags=contact.get("tags"),
+                my_emails=contact.get("emails"),
+                my_phone=contact.get("phone"),
+                my_street=contact.get("street"),
+                my_city=contact.get("city"),
+                my_state=contact.get("state"),
+                my_zip=contact.get("zip"),
+                my_country=contact.get("country"),
+                my_source=contact.get("source"),
+                my_source_id=contact.get("source_id"),
+                my_referred_by=contact.get("referred_by"),
+                my_referred_by_type=contact.get("referred_by_type"),
+                my_prefix=contact.get("prefix"),
+                my_gender=contact.get("gender"),
+                my_date_of_birthday=contact.get("date_of_birthday"),
+                my_note=contact.get("note"),
+                my_street2=contact.get("street2"),
+                my_is_lead=contact.get("is_lead"),
+                my_quickbooks_error=contact.get("quickbooks_error"),
+                my_ledes_client_id=contact.get("ledes_client_id")
+            )
 
-    cursor.connection.commit()
-    print("Contacts inserted into the table successfully.")
+        cursor.connection.commit()
+        logger.info("Contacts inserted into the table successfully.")
+    except Exception as e:
+        logger.error(f"Error inserting contacts into the table: {e}")

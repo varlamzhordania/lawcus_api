@@ -2,7 +2,7 @@ import os
 import platform
 import oracledb
 import requests
-import logging
+from logger import logger
 from utils import make_token_request, exchange_authorization_code_for_token, get_authorization_code_url, truncate_table
 from contacts import create_contact_table, insert_contacts_into_table
 from accounts import create_accounts_table, insert_accounts_into_table
@@ -18,7 +18,8 @@ from activities import create_activity_category_table, create_activity_flat_fees
 from users import create_users_me_table, create_users_team_table, create_users_matters_table, \
     insert_users_matters_into_table, insert_users_me_into_table, create_users_contacts_table, \
     create_users_teammates_table, insert_users_teammates_into_table, insert_users_contacts_into_table, \
-    insert_users_team_into_table
+    insert_users_team_into_table, create_users_matter_tags_table, create_users_matter_custom_field_table, \
+    create_users_matter_assignees_table
 from reports import create_reports_matters_info_table, insert_reports_matters_info_into_table, \
     insert_reports_accounts_receivable_into_table, create_reports_client_trust_table, create_reports_time_entries_table, \
     insert_reports_client_trust_into_table, insert_reports_matter_balance_into_table, \
@@ -27,10 +28,6 @@ from reports import create_reports_matters_info_table, insert_reports_matters_in
     insert_reports_time_entries_into_table, create_reports_trust_ledger_table, insert_reports_client_ledger_into_table, \
     create_reports_payment_collected_table, create_reports_invoice_history_table, create_reports_matter_balance_table, \
     create_reports_revenue_table, insert_reports_revenue_into_table, insert_reports_trust_ledger_into_table
-
-# Set up logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 
 def configure_oracle_client():
@@ -97,39 +94,6 @@ def make_api_request(endpoint, params=None, base_url=None, headers=None, **kwarg
         return None
 
 
-def get_api_token():
-    pass
-
-
-def create_all_tables(cursor):
-    create_contact_table(cursor)
-    create_matters_table(cursor)
-    create_leads_table(cursor)
-    create_interactions_table(cursor)
-    create_tasks_table(cursor)
-    create_accounts_table(cursor)
-    create_activity_category_table(cursor)
-    create_activity_flat_fees_table(cursor)
-    create_activity_time_entry_table(cursor)
-    create_activity_expenses_table(cursor)
-    create_activity_billing_items_table(cursor)
-    create_users_me_table(cursor)
-    create_users_team_table(cursor)
-    create_users_matters_table(cursor)
-    create_users_contacts_table(cursor)
-    create_users_teammates_table(cursor)
-    create_reports_matters_info_table(cursor)
-    create_reports_client_trust_table(cursor)
-    create_reports_time_entries_table(cursor)
-    create_reports_client_ledger_table(cursor)
-    create_reports_accounts_receivable_table(cursor)
-    create_reports_trust_ledger_table(cursor)
-    create_reports_payment_collected_table(cursor)
-    create_reports_invoice_history_table(cursor)
-    create_reports_matter_balance_table(cursor)
-    create_reports_revenue_table(cursor)
-
-
 if __name__ == "__main__":
     # Placeholder database connection parameters
     DB_USERNAME = "root"  # Replace with your DB username
@@ -138,12 +102,19 @@ if __name__ == "__main__":
     DB_PORT = 1521
     DB_SID = "xe"  # Replace with your DB SID
 
+    # DB_USERNAME = "Lawcus_Source"
+    # DB_PASSWORD = "thidlwk2lerierol33"
+    # DB_HOST = " eztestprod.ctv3czkgd3ce.us-west-2.rds.amazonaws.com"
+    # DB_PORT = 1526
+    # DB_SID = "eztest"
+
     client_id = '03d45512d01041eea358c505bdbfe4a2'
     redirect_uri = 'https://www.lawkpis.com/oauth'
 
     state = ''  # Optional
     authorization_code_url = get_authorization_code_url(client_id, redirect_uri, state)
-    print(f"Redirect the user to: {authorization_code_url}")
+    logger.info(f"Redirect the user to: {authorization_code_url}")
+    print(f"Get authorization code from this URL: {authorization_code_url}")
 
     static_auth_code = "b0417aa0aa1d11eea53a2b13a8761e06"
 
@@ -180,144 +151,144 @@ if __name__ == "__main__":
 
     # Define the endpoints and parameters you need to call
     endpoints = [
-        # ("contacts", None),
-        # ("matters", None),
-        # ("leadsources", None),
-        # (
-        #     "interactions",
-        #     {
-        #         "types": '["PHONE","EMAIL","SECURE_MESSAGE"]',
-        #         "sub_types": '["INBOUND","OUTBOUND"]',
-        #         "skip": 0,
-        #         "paginate": 1000
-        #     }
-        # ),
-        # ("tasks", None),
-        # ("accounts", None),
-        # ("timeentries", None),
-        # ("expenses", None),
-        # ("flatfees", None),
-        # ("activities", None),  # alias Categories
-        # (
-        #     "reports/payment-collected",
-        #     {
-        #         "user_id": "",
-        #         "practice_id": "",
-        #         "client_id": "",
-        #         "matter_id": "",
-        #         "start": "",
-        #         "end": "",
-        #         "selected_accounts": ""
-        #     }
-        # ),
-        # (
-        #     "reports/invoice-history",
-        #     {
-        #         "user_id": "",
-        #         "group_by": "",
-        #         "practice_id": "",
-        #         "client_id": "",
-        #         "start": "",
-        #         "end": ""
-        #     }
-        # ),
-        # (
-        #     "reports/matter-balance",
-        #     {
-        #         "user_id": "",
-        #         "group_by": "",
-        #         "practice_id": "",
-        #         "client_id": "",
-        #         "start": "",
-        #         "end": "",
-        #         "trust": ""
-        #     }
-        # ),
-        # (
-        #     "reports/client-trust",
-        #     {
-        #         "client_id": "",
-        #         "start": "",
-        #         "end": "",
-        #         "display_zero": "",
-        #         "practice_id": "",
-        #     }
-        # ),
-        # (
-        #     "reports/client-ledger",
-        #     {
-        #         "practice_id": "",
-        #         "client_id": "",
-        #         "start": "",
-        #         "end": "",
-        #     }
-        # ),
-        # (
-        #     "reports/trust-ledger",
-        #     {
-        #         "account_id": "",
-        #         "practice_id": "",
-        #         "client_id": "",
-        #         "matter_id": "",
-        #         "start": "",
-        #         "end": "",
-        #         "display_zero": "",
-        #     }
-        # ),
-        # (
-        #     "reports/time-entries",
-        #     {
-        #         "group_by": "",
-        #         "user_id": "",
-        #         "matter_id": "",
-        #         "start": "",
-        #         "end": "",
-        #         "status": "",
-        #     }
-        # ),
-        # (
-        #     "reports/revenue",
-        #     {
-        #         "matter_id": "",
-        #         "client_id": "",
-        #         "user_id": "",
-        #         "start": "",
-        #         "end": "",
-        #     }
-        # ),
-        # (
-        #     "reports/accounts-receivable",
-        #     {
-        #         "user_id": "",
-        #         "group_by": "",
-        #         "practice_id": "",
-        #         "client_id": "",
-        #         "matter_id": "",
-        #         "start": "",
-        #         "end": "",
-        #     }
-        # ),
-        # ("reports/matters/info", None),
-        # ("users/me", None),
-        # ("users/teammates", None),
-        # ("users/team", None),
-        # (
-        #     "users/data/contacts",
-        #     {
-        #         "take": "",
-        #         "skip": "",
-        #         "updated_after": "",  # {{YYYY-MM-DD HH:MM:SS}}
-        #     }
-        # ),
-        # (
-        #     "users/data/matters",
-        #     {
-        #         "take": "",
-        #         "skip": "",
-        #         "status": "",  # OPEN , LEAD , ARCHIVED , NOT_HIRED
-        #         "updated_after": "",  # YYYY-MM-DD HH:MM:SS
-        #     }
-        # ),
+        ("contacts", None),
+        ("matters", None),
+        ("leadsources", None),
+        (
+            "interactions",
+            {
+                "types": '["PHONE","EMAIL","SECURE_MESSAGE"]',
+                "sub_types": '["INBOUND","OUTBOUND"]',
+                "skip": 0,
+                "paginate": 1000
+            }
+        ),
+        ("tasks", None),
+        ("accounts", None),
+        ("timeentries", None),
+        ("expenses", None),
+        ("flatfees", None),
+        ("activities", None),  # alias Categories
+        (
+            "reports/payment-collected",
+            {
+                "user_id": "",
+                "practice_id": "",
+                "client_id": "",
+                "matter_id": "",
+                "start": "",
+                "end": "",
+                "selected_accounts": ""
+            }
+        ),
+        (
+            "reports/invoice-history",
+            {
+                "user_id": "",
+                "group_by": "",
+                "practice_id": "",
+                "client_id": "",
+                "start": "",
+                "end": ""
+            }
+        ),
+        (
+            "reports/matter-balance",
+            {
+                "user_id": "",
+                "group_by": "",
+                "practice_id": "",
+                "client_id": "",
+                "start": "",
+                "end": "",
+                "trust": ""
+            }
+        ),
+        (
+            "reports/client-trust",
+            {
+                "client_id": "",
+                "start": "",
+                "end": "",
+                "display_zero": "",
+                "practice_id": "",
+            }
+        ),
+        (
+            "reports/client-ledger",
+            {
+                "practice_id": "",
+                "client_id": "",
+                "start": "",
+                "end": "",
+            }
+        ),
+        (
+            "reports/trust-ledger",
+            {
+                "account_id": "",
+                "practice_id": "",
+                "client_id": "",
+                "matter_id": "",
+                "start": "",
+                "end": "",
+                "display_zero": "",
+            }
+        ),
+        (
+            "reports/time-entries",
+            {
+                "group_by": "",
+                "user_id": "",
+                "matter_id": "",
+                "start": "",
+                "end": "",
+                "status": "",
+            }
+        ),
+        (
+            "reports/revenue",
+            {
+                "matter_id": "",
+                "client_id": "",
+                "user_id": "",
+                "start": "",
+                "end": "",
+            }
+        ),
+        (
+            "reports/accounts-receivable",
+            {
+                "user_id": "",
+                "group_by": "",
+                "practice_id": "",
+                "client_id": "",
+                "matter_id": "",
+                "start": "",
+                "end": "",
+            }
+        ),
+        ("reports/matters/info", None),
+        ("users/me", None),
+        ("users/teammates", None),
+        ("users/team", None),
+        (
+            "users/data/contacts",
+            {
+                "take": "",
+                "skip": "",
+                "updated_after": "",  # {{YYYY-MM-DD HH:MM:SS}}
+            }
+        ),
+        (
+            "users/data/matters",
+            {
+                "take": "",
+                "skip": "",
+                "status": "",  # OPEN , LEAD , ARCHIVED , NOT_HIRED
+                "updated_after": "",  # YYYY-MM-DD HH:MM:SS
+            }
+        ),
     ]
 
     for endpoint, params in endpoints:
@@ -429,7 +400,15 @@ if __name__ == "__main__":
                 insert_users_contacts_into_table(oracle_cursor, endpoint_data)
             elif endpoint == "users/data/matters":
                 create_users_matters_table(oracle_cursor)
+                create_users_matter_tags_table(oracle_cursor)
+                create_users_matter_custom_field_table(oracle_cursor)
+                create_users_matter_assignees_table(oracle_cursor)
                 truncate_table(oracle_cursor, "LAWCUS_USERS_MATTERS")
+                truncate_table(oracle_cursor, "LAWCUS_USERS_MATTER_ASSIGNEES")
+                truncate_table(oracle_cursor, "LAWCUS_USERS_MATTER_CF")
+                truncate_table(oracle_cursor, "LAWCUS_USERS_MATTER_TAGS")
                 insert_users_matters_into_table(oracle_cursor, endpoint_data)
+
+    print("Script successfully completed. Please check the logs for more information.")
     # Close the database cursor when done
     oracle_cursor.close()

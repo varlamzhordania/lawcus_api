@@ -50,4 +50,5 @@ endpoints, and inserts data into corresponding tables.
 - `main.py`: Main script for data migration.
 - `contacts.py`, `matters.py`, ...: Endpoint-specific scripts with functions for creating tables and inserting data.
 - `utils.py`: Utility functions used across different scripts.
+- `logger.py`: Configuration and settings for the logger.
 - `requirements.txt`: List of Python dependencies.
