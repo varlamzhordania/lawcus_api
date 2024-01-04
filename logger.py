@@ -14,7 +14,7 @@ log_file_path = os.path.join(logs_folder, f'app_{current_date}.log')
 logging.basicConfig(filename=log_file_path, level=logging.INFO)
 
 # Configure the log format
-log_formatter = logging.Formatter('%(asctime)s - %(levelname)s')
+log_formatter = logging.Formatter('%(asctime)s')
 log_handler = logging.FileHandler(log_file_path)
 log_handler.setFormatter(log_formatter)
 
