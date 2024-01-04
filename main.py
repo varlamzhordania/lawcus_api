@@ -1,4 +1,4 @@
-import os
+import os, sys
 import platform
 import oracledb
 import requests
@@ -108,306 +108,350 @@ if __name__ == "__main__":
     # DB_PORT = 1526
     # DB_SID = "eztest"
 
+    # Connect to the Oracle database
+
+    if DB_USERNAME and DB_PASSWORD and DB_HOST and DB_PORT and DB_SID:
+        oracle_cursor = connect_to_database(
+            username=DB_USERNAME,
+            password=DB_PASSWORD,
+            host=DB_HOST,
+            port=DB_PORT,
+            service_id=DB_SID
+        )
+    else:
+        missing_credentials = []
+
+        if not DB_USERNAME:
+            missing_credentials.append("username")
+        if not DB_PASSWORD:
+            missing_credentials.append("password")
+        if not DB_HOST:
+            missing_credentials.append("host")
+        if not DB_PORT:
+            missing_credentials.append("port")
+        if not DB_SID:
+            missing_credentials.append("SID")
+
+        print(f"Please make sure the following database credentials are provided: {', '.join(missing_credentials)}")
+        sys.exit(1)  # Exit with a non-zero status code to indicate an error
+
+    # Define Lawcus API credentials
     client_id = '03d45512d01041eea358c505bdbfe4a2'
     redirect_uri = 'https://www.lawkpis.com/oauth'
-
-    state = ''  # Optional
-    authorization_code_url = get_authorization_code_url(client_id, redirect_uri, state)
-    logger.info(f"Redirect the user to: {authorization_code_url}")
-    print(f"Get authorization code from this URL: {authorization_code_url}")
-
     static_auth_code = "b0417aa0aa1d11eea53a2b13a8761e06"
-
-    authorization_code = input(
-        "Enter the authorization code(leave it empty to use default): ", ) or static_auth_code
-
     client_secret = '81f88e344bad4b68ad0e8d98dafdb0a56bec332fa2cd4172b97391b1f621cb55'
+    state = ''  # Optional
 
-    token_data = exchange_authorization_code_for_token(
-        client_id,
-        client_secret,
-        redirect_uri,
-        authorization_code
-    )
+    # Check if required credentials are provided
+    if client_id and redirect_uri and client_secret:
+        # Obtain authorization code
+        authorization_code_url = get_authorization_code_url(client_id, redirect_uri, state)
+        logger.info(f"Redirect the user to: {authorization_code_url}")
+        print(f"Get authorization code from this URL: {authorization_code_url}")
 
-    access_token = token_data.get("access_token")
+        # Allow the user to input authorization code, using the default if not provided
+        authorization_code = input(
+            "Enter the authorization code (leave it empty to use default): "
+        ) or static_auth_code
 
-    # Placeholder API endpoint and headers
-    API_BASE_URL = "https://api.us.lawcus.com"
-    API_ACCESS_TOKEN = access_token  # Replace with your actual API access token
-    API_HEADERS = {
-        "Authorization": f"Oauth Bearer {API_ACCESS_TOKEN}",
-        "Content-Type": "application/json",
-    }
+        # Exchange authorization code for an access token
+        token_data = exchange_authorization_code_for_token(
+            client_id,
+            client_secret,
+            redirect_uri,
+            authorization_code
+        )
 
-    # Connect to the Oracle database
-    oracle_cursor = connect_to_database(
-        username=DB_USERNAME,
-        password=DB_PASSWORD,
-        host=DB_HOST,
-        port=DB_PORT,
-        service_id=DB_SID
-    )
+        access_token = token_data.get("access_token")
+
+        # Placeholder API endpoint and headers
+        API_BASE_URL = "https://api.us.lawcus.com"
+        API_ACCESS_TOKEN = access_token
+        API_HEADERS = {
+            "Authorization": f"Oauth Bearer {API_ACCESS_TOKEN}",
+            "Content-Type": "application/json",
+        }
+
+    else:
+        print("Please make sure client_id, redirect_uri, and client_secret are valid.")
+        sys.exit(1)
 
     # Define the endpoints and parameters you need to call
     endpoints = [
-        ("contacts", None),
-        ("matters", None),
-        ("leadsources", None),
-        (
-            "interactions",
-            {
-                "types": '["PHONE","EMAIL","SECURE_MESSAGE"]',
-                "sub_types": '["INBOUND","OUTBOUND"]',
-                "skip": 0,
-                "paginate": 1000
-            }
-        ),
-        ("tasks", None),
-        ("accounts", None),
-        ("timeentries", None),
-        ("expenses", None),
-        ("flatfees", None),
-        ("activities", None),  # alias Categories
-        (
-            "reports/payment-collected",
-            {
-                "user_id": "",
-                "practice_id": "",
-                "client_id": "",
-                "matter_id": "",
-                "start": "",
-                "end": "",
-                "selected_accounts": ""
-            }
-        ),
-        (
-            "reports/invoice-history",
-            {
-                "user_id": "",
-                "group_by": "",
-                "practice_id": "",
-                "client_id": "",
-                "start": "",
-                "end": ""
-            }
-        ),
-        (
-            "reports/matter-balance",
-            {
-                "user_id": "",
-                "group_by": "",
-                "practice_id": "",
-                "client_id": "",
-                "start": "",
-                "end": "",
-                "trust": ""
-            }
-        ),
-        (
-            "reports/client-trust",
-            {
-                "client_id": "",
-                "start": "",
-                "end": "",
-                "display_zero": "",
-                "practice_id": "",
-            }
-        ),
-        (
-            "reports/client-ledger",
-            {
-                "practice_id": "",
-                "client_id": "",
-                "start": "",
-                "end": "",
-            }
-        ),
-        (
-            "reports/trust-ledger",
-            {
-                "account_id": "",
-                "practice_id": "",
-                "client_id": "",
-                "matter_id": "",
-                "start": "",
-                "end": "",
-                "display_zero": "",
-            }
-        ),
-        (
-            "reports/time-entries",
-            {
-                "group_by": "",
-                "user_id": "",
-                "matter_id": "",
-                "start": "",
-                "end": "",
-                "status": "",
-            }
-        ),
-        (
-            "reports/revenue",
-            {
-                "matter_id": "",
-                "client_id": "",
-                "user_id": "",
-                "start": "",
-                "end": "",
-            }
-        ),
-        (
-            "reports/accounts-receivable",
-            {
-                "user_id": "",
-                "group_by": "",
-                "practice_id": "",
-                "client_id": "",
-                "matter_id": "",
-                "start": "",
-                "end": "",
-            }
-        ),
-        ("reports/matters/info", None),
-        ("users/me", None),
-        ("users/teammates", None),
-        ("users/team", None),
-        (
-            "users/data/contacts",
-            {
-                "take": "",
-                "skip": "",
-                "updated_after": "",  # {{YYYY-MM-DD HH:MM:SS}}
-            }
-        ),
-        (
-            "users/data/matters",
-            {
-                "take": "",
-                "skip": "",
-                "status": "",  # OPEN , LEAD , ARCHIVED , NOT_HIRED
-                "updated_after": "",  # YYYY-MM-DD HH:MM:SS
-            }
-        ),
+        # ("contacts", None),
+        # ("matters", None),
+        # ("leadsources", None),
+        # (
+        #     "interactions",
+        #     {
+        #         "types": '["PHONE","EMAIL","SECURE_MESSAGE"]',
+        #         "sub_types": '["INBOUND","OUTBOUND"]',
+        #         "skip": 0,
+        #         "paginate": 1000
+        #     }
+        # ),
+        # ("tasks", None),
+        # ("accounts", None),
+        # ("timeentries", None),
+        # ("expenses", None),
+        # ("flatfees", None),
+        # ("activities", None),  # alias Categories
+        # (
+        #     "reports/payment-collected",
+        #     {
+        #         "user_id": "",
+        #         "practice_id": "",
+        #         "client_id": "",
+        #         "matter_id": "",
+        #         "start": "",
+        #         "end": "",
+        #         "selected_accounts": ""
+        #     }
+        # ),
+        # (
+        #     "reports/invoice-history",
+        #     {
+        #         "user_id": "",
+        #         "group_by": "",
+        #         "practice_id": "",
+        #         "client_id": "",
+        #         "start": "",
+        #         "end": ""
+        #     }
+        # ),
+        # (
+        #     "reports/matter-balance",
+        #     {
+        #         "user_id": "",
+        #         "group_by": "",
+        #         "practice_id": "",
+        #         "client_id": "",
+        #         "start": "",
+        #         "end": "",
+        #         "trust": ""
+        #     }
+        # ),
+        # (
+        #     "reports/client-trust",
+        #     {
+        #         "client_id": "",
+        #         "start": "",
+        #         "end": "",
+        #         "display_zero": "",
+        #         "practice_id": "",
+        #     }
+        # ),
+        # (
+        #     "reports/client-ledger",
+        #     {
+        #         "practice_id": "",
+        #         "client_id": "",
+        #         "start": "",
+        #         "end": "",
+        #     }
+        # ),
+        # (
+        #     "reports/trust-ledger",
+        #     {
+        #         "account_id": "",
+        #         "practice_id": "",
+        #         "client_id": "",
+        #         "matter_id": "",
+        #         "start": "",
+        #         "end": "",
+        #         "display_zero": "",
+        #     }
+        # ),
+        # (
+        #     "reports/time-entries",
+        #     {
+        #         "group_by": "",
+        #         "user_id": "",
+        #         "matter_id": "",
+        #         "start": "",
+        #         "end": "",
+        #         "status": "",
+        #     }
+        # ),
+        # (
+        #     "reports/revenue",
+        #     {
+        #         "matter_id": "",
+        #         "client_id": "",
+        #         "user_id": "",
+        #         "start": "",
+        #         "end": "",
+        #     }
+        # ),
+        # (
+        #     "reports/accounts-receivable",
+        #     {
+        #         "user_id": "",
+        #         "group_by": "",
+        #         "practice_id": "",
+        #         "client_id": "",
+        #         "matter_id": "",
+        #         "start": "",
+        #         "end": "",
+        #     }
+        # ),
+        # ("reports/matters/info", None),
+        # ("users/me", None),
+        # ("users/teammates", None),
+        # ("users/team", None),
+        # (
+        #     "users/data/contacts",
+        #     {
+        #         "take": "",
+        #         "skip": "",
+        #         "updated_after": "",  # {{YYYY-MM-DD HH:MM:SS}}
+        #     }
+        # ),
+        # (
+        #     "users/data/matters",
+        #     {
+        #         "take": "",
+        #         "skip": "",
+        #         "status": "",  # OPEN , LEAD , ARCHIVED , NOT_HIRED
+        #         "updated_after": "",  # YYYY-MM-DD HH:MM:SS
+        #     }
+        # ),
     ]
 
-    for endpoint, params in endpoints:
-        # Make API request for the current endpoint
-        endpoint_data = make_api_request(endpoint=endpoint, params=params, base_url=API_BASE_URL, headers=API_HEADERS)
-        if endpoint_data:
-            # Execute the corresponding function based on the endpoint
-            if endpoint == "contacts":
-                create_contact_table(oracle_cursor)
-                truncate_table(oracle_cursor, "LAWCUS_CONTACTS")
-                insert_contacts_into_table(oracle_cursor, endpoint_data["list"])
-            elif endpoint == "matters":
-                create_matters_table(oracle_cursor)
-                create_matter_assignees_table(oracle_cursor)
-                create_matter_custom_field_table(oracle_cursor)
-                create_matter_tags_table(oracle_cursor)
-                truncate_table(oracle_cursor, "LAWCUS_MATTERS")
-                truncate_table(oracle_cursor, "LAWCUS_MATTER_ASSIGNEES")
-                truncate_table(oracle_cursor, "LAWCUS_MATTER_CUSTOM_FIELD")
-                truncate_table(oracle_cursor, "LAWCUS_MATTER_TAGS")
-                insert_matters_into_table(oracle_cursor, endpoint_data)
-            elif endpoint == "leadsources":
-                create_leads_table(oracle_cursor)
-                truncate_table(oracle_cursor, "LAWCUS_LEADSOURCES")
-                insert_leads_into_table(oracle_cursor, endpoint_data)
-            elif endpoint == "interactions":
-                create_interactions_table(oracle_cursor)
-                truncate_table(oracle_cursor, "LAWCUS_INTERACTIONS")
-                insert_interactions_into_table(oracle_cursor, endpoint_data["list"])
-            elif endpoint == "tasks":
-                create_tasks_table(oracle_cursor)
-                truncate_table(oracle_cursor, "LAWCUS_TASKS")
-                insert_tasks_into_table(oracle_cursor, endpoint_data)
-            elif endpoint == "accounts":
-                create_accounts_table(oracle_cursor)
-                truncate_table(oracle_cursor, "LAWCUS_ACCOUNTS")
-                insert_accounts_into_table(oracle_cursor, endpoint_data)
-            elif endpoint == "timeentries":
-                create_activity_time_entry_table(oracle_cursor)
-                truncate_table(oracle_cursor, "LAWCUS_ACTIVITY_TIME_ENTRY")
-                insert_activity_time_entries_into_table(oracle_cursor, endpoint_data)
-            elif endpoint == "expenses":
-                create_activity_expenses_table(oracle_cursor)
-                truncate_table(oracle_cursor, "LAWCUS_ACTIVITY_EXPENSES")
-                insert_activity_expenses_into_table(oracle_cursor, endpoint_data)
-            elif endpoint == "flatfees":
-                create_activity_flat_fees_table(oracle_cursor)
-                truncate_table(oracle_cursor, "LAWCUS_ACTIVITY_FLAT_FEE")
-                insert_activity_flat_fees_into_table(oracle_cursor, endpoint_data)
-            elif endpoint == "activities":
-                create_activity_category_table(oracle_cursor)
-                truncate_table(oracle_cursor, "LAWCUS_ACTIVITY_CATEGORY")
-                insert_activity_category_into_table(oracle_cursor, endpoint_data)
-            elif endpoint == "reports/payment-collected":
-                create_reports_payment_collected_table(oracle_cursor)
-                truncate_table(oracle_cursor, "LAWCUS_REPORTS_COLLECTED")
-                insert_reports_payment_collected_into_table(oracle_cursor, endpoint_data)
-            elif endpoint == "reports/invoice-history":
-                create_reports_invoice_history_table(oracle_cursor)
-                truncate_table(oracle_cursor, "LAWCUS_REPORTS_INVOICE_HISTORY")
-                insert_reports_invoice_history_into_table(oracle_cursor, endpoint_data)
-            elif endpoint == "reports/matter-balance":
-                create_reports_matter_balance_table(oracle_cursor)
-                truncate_table(oracle_cursor, "LAWCUS_REPORTS_MATTER_BALANCE")
-                # insert_reports_matter_balance_into_table(oracle_cursor, endpoint_data)
-            elif endpoint == "reports/client-trust":
-                create_reports_client_trust_table(oracle_cursor)
-                truncate_table(oracle_cursor, "LAWCUS_REPORTS_CLIENT_TRUST")
-                insert_reports_client_trust_into_table(oracle_cursor, endpoint_data)
-            elif endpoint == "reports/client-ledger":
-                create_reports_client_ledger_table(oracle_cursor)
-                truncate_table(oracle_cursor, "LAWCUS_REPORTS_CLIENT_LEDGER")
-                insert_reports_client_ledger_into_table(oracle_cursor, endpoint_data)
-            elif endpoint == "reports/trust-ledger":
-                create_reports_trust_ledger_table(oracle_cursor)
-                truncate_table(oracle_cursor, "LAWCUS_REPORTS_TRUST_LEDGER")
-                insert_reports_trust_ledger_into_table(oracle_cursor, endpoint_data)
-            elif endpoint == "reports/time-entries":
-                create_reports_time_entries_table(oracle_cursor)
-                truncate_table(oracle_cursor, "LAWCUS_REPORTS_TIME_ENTRIES")
-                insert_reports_time_entries_into_table(oracle_cursor, endpoint_data)
-            elif endpoint == "reports/revenue":
-                create_reports_revenue_table(oracle_cursor)
-                truncate_table(oracle_cursor, "LAWCUS_REPORTS_REVENUE")
-                insert_reports_revenue_into_table(oracle_cursor, endpoint_data)
-            elif endpoint == "reports/accounts-receivable":
-                create_reports_accounts_receivable_table(oracle_cursor)
-                truncate_table(oracle_cursor, "LAWCUS_REPORTS_RECEIVABLE")
-                insert_reports_accounts_receivable_into_table(oracle_cursor, endpoint_data)
-            elif endpoint == "reports/matters/info":
-                create_reports_matters_info_table(oracle_cursor)
-                truncate_table(oracle_cursor, "LAWCUS_REPORTS_MATTERS_INFO")
-                insert_reports_matters_info_into_table(oracle_cursor, endpoint_data)
-            elif endpoint == "users/me":
-                create_users_me_table(oracle_cursor)
-                truncate_table(oracle_cursor, "LAWCUS_USERS_ME")
-                insert_users_me_into_table(oracle_cursor, endpoint_data)
-            elif endpoint == "users/teammates":
-                create_users_teammates_table(oracle_cursor)
-                truncate_table(oracle_cursor, "LAWCUS_USERS_TEAMMATES")
-                insert_users_teammates_into_table(oracle_cursor, endpoint_data)
-            elif endpoint == "users/team":
-                create_users_team_table(oracle_cursor)
-                truncate_table(oracle_cursor, "LAWCUS_USERS_TEAM")
-                insert_users_team_into_table(oracle_cursor, endpoint_data)
-            elif endpoint == "users/data/contacts":
-                create_users_contacts_table(oracle_cursor)
-                truncate_table(oracle_cursor, "LAWCUS_USERS_CONTACTS")
-                insert_users_contacts_into_table(oracle_cursor, endpoint_data)
-            elif endpoint == "users/data/matters":
-                create_users_matters_table(oracle_cursor)
-                create_users_matter_tags_table(oracle_cursor)
-                create_users_matter_custom_field_table(oracle_cursor)
-                create_users_matter_assignees_table(oracle_cursor)
-                truncate_table(oracle_cursor, "LAWCUS_USERS_MATTERS")
-                truncate_table(oracle_cursor, "LAWCUS_USERS_MATTER_ASSIGNEES")
-                truncate_table(oracle_cursor, "LAWCUS_USERS_MATTER_CF")
-                truncate_table(oracle_cursor, "LAWCUS_USERS_MATTER_TAGS")
-                insert_users_matters_into_table(oracle_cursor, endpoint_data)
+    if access_token and endpoints:
+        for endpoint, params in endpoints:
+            # Make API request for the current endpoint
+            endpoint_data = make_api_request(
+                endpoint=endpoint,
+                params=params,
+                base_url=API_BASE_URL,
+                headers=API_HEADERS
+            )
+            if endpoint_data:
+                print(f"Initiating data insertion process for endpoint: {endpoint}")
+                # Execute the corresponding function based on the endpoint
+                if endpoint == "contacts":
+                    create_contact_table(oracle_cursor)
+                    truncate_table(oracle_cursor, "LAWCUS_CONTACTS")
+                    insert_contacts_into_table(oracle_cursor, endpoint_data["list"])
+                elif endpoint == "matters":
+                    create_matters_table(oracle_cursor)
+                    create_matter_assignees_table(oracle_cursor)
+                    create_matter_custom_field_table(oracle_cursor)
+                    create_matter_tags_table(oracle_cursor)
+                    truncate_table(oracle_cursor, "LAWCUS_MATTERS")
+                    truncate_table(oracle_cursor, "LAWCUS_MATTER_ASSIGNEES")
+                    truncate_table(oracle_cursor, "LAWCUS_MATTER_CUSTOM_FIELD")
+                    truncate_table(oracle_cursor, "LAWCUS_MATTER_TAGS")
+                    insert_matters_into_table(oracle_cursor, endpoint_data)
+                elif endpoint == "leadsources":
+                    create_leads_table(oracle_cursor)
+                    truncate_table(oracle_cursor, "LAWCUS_LEADSOURCES")
+                    insert_leads_into_table(oracle_cursor, endpoint_data)
+                elif endpoint == "interactions":
+                    create_interactions_table(oracle_cursor)
+                    truncate_table(oracle_cursor, "LAWCUS_INTERACTIONS")
+                    insert_interactions_into_table(oracle_cursor, endpoint_data["list"])
+                elif endpoint == "tasks":
+                    create_tasks_table(oracle_cursor)
+                    truncate_table(oracle_cursor, "LAWCUS_TASKS")
+                    insert_tasks_into_table(oracle_cursor, endpoint_data)
+                elif endpoint == "accounts":
+                    create_accounts_table(oracle_cursor)
+                    truncate_table(oracle_cursor, "LAWCUS_ACCOUNTS")
+                    insert_accounts_into_table(oracle_cursor, endpoint_data)
+                elif endpoint == "timeentries":
+                    create_activity_time_entry_table(oracle_cursor)
+                    truncate_table(oracle_cursor, "LAWCUS_ACTIVITY_TIME_ENTRY")
+                    insert_activity_time_entries_into_table(oracle_cursor, endpoint_data)
+                elif endpoint == "expenses":
+                    create_activity_expenses_table(oracle_cursor)
+                    truncate_table(oracle_cursor, "LAWCUS_ACTIVITY_EXPENSES")
+                    insert_activity_expenses_into_table(oracle_cursor, endpoint_data)
+                elif endpoint == "flatfees":
+                    create_activity_flat_fees_table(oracle_cursor)
+                    truncate_table(oracle_cursor, "LAWCUS_ACTIVITY_FLAT_FEE")
+                    insert_activity_flat_fees_into_table(oracle_cursor, endpoint_data)
+                elif endpoint == "activities":
+                    create_activity_category_table(oracle_cursor)
+                    truncate_table(oracle_cursor, "LAWCUS_ACTIVITY_CATEGORY")
+                    insert_activity_category_into_table(oracle_cursor, endpoint_data)
+                elif endpoint == "reports/payment-collected":
+                    create_reports_payment_collected_table(oracle_cursor)
+                    truncate_table(oracle_cursor, "LAWCUS_REPORTS_COLLECTED")
+                    insert_reports_payment_collected_into_table(oracle_cursor, endpoint_data)
+                elif endpoint == "reports/invoice-history":
+                    create_reports_invoice_history_table(oracle_cursor)
+                    truncate_table(oracle_cursor, "LAWCUS_REPORTS_INVOICE_HISTORY")
+                    insert_reports_invoice_history_into_table(oracle_cursor, endpoint_data)
+                elif endpoint == "reports/matter-balance":
+                    create_reports_matter_balance_table(oracle_cursor)
+                    truncate_table(oracle_cursor, "LAWCUS_REPORTS_MATTER_BALANCE")
+                    # insert_reports_matter_balance_into_table(oracle_cursor, endpoint_data)
+                elif endpoint == "reports/client-trust":
+                    create_reports_client_trust_table(oracle_cursor)
+                    truncate_table(oracle_cursor, "LAWCUS_REPORTS_CLIENT_TRUST")
+                    insert_reports_client_trust_into_table(oracle_cursor, endpoint_data)
+                elif endpoint == "reports/client-ledger":
+                    create_reports_client_ledger_table(oracle_cursor)
+                    truncate_table(oracle_cursor, "LAWCUS_REPORTS_CLIENT_LEDGER")
+                    insert_reports_client_ledger_into_table(oracle_cursor, endpoint_data)
+                elif endpoint == "reports/trust-ledger":
+                    create_reports_trust_ledger_table(oracle_cursor)
+                    truncate_table(oracle_cursor, "LAWCUS_REPORTS_TRUST_LEDGER")
+                    insert_reports_trust_ledger_into_table(oracle_cursor, endpoint_data)
+                elif endpoint == "reports/time-entries":
+                    create_reports_time_entries_table(oracle_cursor)
+                    truncate_table(oracle_cursor, "LAWCUS_REPORTS_TIME_ENTRIES")
+                    insert_reports_time_entries_into_table(oracle_cursor, endpoint_data)
+                elif endpoint == "reports/revenue":
+                    create_reports_revenue_table(oracle_cursor)
+                    truncate_table(oracle_cursor, "LAWCUS_REPORTS_REVENUE")
+                    insert_reports_revenue_into_table(oracle_cursor, endpoint_data)
+                elif endpoint == "reports/accounts-receivable":
+                    create_reports_accounts_receivable_table(oracle_cursor)
+                    truncate_table(oracle_cursor, "LAWCUS_REPORTS_RECEIVABLE")
+                    insert_reports_accounts_receivable_into_table(oracle_cursor, endpoint_data)
+                elif endpoint == "reports/matters/info":
+                    create_reports_matters_info_table(oracle_cursor)
+                    truncate_table(oracle_cursor, "LAWCUS_REPORTS_MATTERS_INFO")
+                    insert_reports_matters_info_into_table(oracle_cursor, endpoint_data)
+                elif endpoint == "users/me":
+                    create_users_me_table(oracle_cursor)
+                    truncate_table(oracle_cursor, "LAWCUS_USERS_ME")
+                    insert_users_me_into_table(oracle_cursor, endpoint_data)
+                elif endpoint == "users/teammates":
+                    create_users_teammates_table(oracle_cursor)
+                    truncate_table(oracle_cursor, "LAWCUS_USERS_TEAMMATES")
+                    insert_users_teammates_into_table(oracle_cursor, endpoint_data)
+                elif endpoint == "users/team":
+                    create_users_team_table(oracle_cursor)
+                    truncate_table(oracle_cursor, "LAWCUS_USERS_TEAM")
+                    insert_users_team_into_table(oracle_cursor, endpoint_data)
+                elif endpoint == "users/data/contacts":
+                    create_users_contacts_table(oracle_cursor)
+                    truncate_table(oracle_cursor, "LAWCUS_USERS_CONTACTS")
+                    insert_users_contacts_into_table(oracle_cursor, endpoint_data)
+                elif endpoint == "users/data/matters":
+                    create_users_matters_table(oracle_cursor)
+                    create_users_matter_tags_table(oracle_cursor)
+                    create_users_matter_custom_field_table(oracle_cursor)
+                    create_users_matter_assignees_table(oracle_cursor)
+                    truncate_table(oracle_cursor, "LAWCUS_USERS_MATTERS")
+                    truncate_table(oracle_cursor, "LAWCUS_USERS_MATTER_ASSIGNEES")
+                    truncate_table(oracle_cursor, "LAWCUS_USERS_MATTER_CF")
+                    truncate_table(oracle_cursor, "LAWCUS_USERS_MATTER_TAGS")
+                    insert_users_matters_into_table(oracle_cursor, endpoint_data)
+            else:
+                print(
+                    f"Failed to initiate data insertion process for endpoint '{endpoint}' because the retrieved data is None."
+                )
+    else:
+        print(
+            "Please ensure that the access token is valid and the required endpoints exist. "
+            "Check your Lawcus API details and verify the access token's validity."
+        )
+        sys.exit(1)
 
     print("Script successfully completed. Please check the logs for more information.")
     # Close the database cursor when done
