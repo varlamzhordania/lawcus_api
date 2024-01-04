@@ -8,7 +8,8 @@ from contacts import create_contact_table, insert_contacts_into_table
 from accounts import create_accounts_table, insert_accounts_into_table
 from interactions import create_interactions_table, insert_interactions_into_table
 from leads import create_leads_table, insert_leads_into_table
-from matters import create_matters_table, insert_matters_into_table
+from matters import create_matters_table, insert_matters_into_table, create_matter_assignees_table, \
+    create_matter_tags_table, create_matter_custom_field_table
 from tasks import create_tasks_table, insert_tasks_into_table
 from activities import create_activity_category_table, create_activity_flat_fees_table, \
     insert_activity_flat_fees_into_table, insert_activity_time_entries_into_table, create_activity_time_entry_table, \
@@ -179,144 +180,144 @@ if __name__ == "__main__":
 
     # Define the endpoints and parameters you need to call
     endpoints = [
-        ("contacts", None),
-        ("matters", None),
-        ("leadsources", None),
-        (
-            "interactions",
-            {
-                "types": '["PHONE","EMAIL","SECURE_MESSAGE"]',
-                "sub_types": '["INBOUND","OUTBOUND"]',
-                "skip": 0,
-                "paginate": 1000
-            }
-        ),
-        ("tasks", None),
-        ("accounts", None),
-        ("timeentries", None),
-        ("expenses", None),
-        ("flatfees", None),
-        ("activities", None),  # alias Categories
-        (
-            "reports/payment-collected",
-            {
-                "user_id": "",
-                "practice_id": "",
-                "client_id": "",
-                "matter_id": "",
-                "start": "",
-                "end": "",
-                "selected_accounts": ""
-            }
-        ),
-        (
-            "reports/invoice-history",
-            {
-                "user_id": "",
-                "group_by": "",
-                "practice_id": "",
-                "client_id": "",
-                "start": "",
-                "end": ""
-            }
-        ),
-        (
-            "reports/matter-balance",
-            {
-                "user_id": "",
-                "group_by": "",
-                "practice_id": "",
-                "client_id": "",
-                "start": "",
-                "end": "",
-                "trust": ""
-            }
-        ),
-        (
-            "reports/client-trust",
-            {
-                "client_id": "",
-                "start": "",
-                "end": "",
-                "display_zero": "",
-                "practice_id": "",
-            }
-        ),
-        (
-            "reports/client-ledger",
-            {
-                "practice_id": "",
-                "client_id": "",
-                "start": "",
-                "end": "",
-            }
-        ),
-        (
-            "reports/trust-ledger",
-            {
-                "account_id": "",
-                "practice_id": "",
-                "client_id": "",
-                "matter_id": "",
-                "start": "",
-                "end": "",
-                "display_zero": "",
-            }
-        ),
-        (
-            "reports/time-entries",
-            {
-                "group_by": "",
-                "user_id": "",
-                "matter_id": "",
-                "start": "",
-                "end": "",
-                "status": "",
-            }
-        ),
-        (
-            "reports/revenue",
-            {
-                "matter_id": "",
-                "client_id": "",
-                "user_id": "",
-                "start": "",
-                "end": "",
-            }
-        ),
-        (
-            "reports/accounts-receivable",
-            {
-                "user_id": "",
-                "group_by": "",
-                "practice_id": "",
-                "client_id": "",
-                "matter_id": "",
-                "start": "",
-                "end": "",
-            }
-        ),
-        ("reports/matters/info", None),
-        ("users/me", None),
-        ("users/teammates", None),
-        ("users/team", None),
-        (
-            "users/data/contacts",
-            {
-                "take": "",
-                "skip": "",
-                "updated_after": "",  # {{YYYY-MM-DD HH:MM:SS}}
-            }
-        ),
-        (
-            "users/data/matters",
-            {
-                "take": "",
-                "skip": "",
-                "status": "",  # OPEN , LEAD , ARCHIVED , NOT_HIRED
-                "updated_after": "",  # YYYY-MM-DD HH:MM:SS
-            }
-        ),
+        # ("contacts", None),
+        # ("matters", None),
+        # ("leadsources", None),
+        # (
+        #     "interactions",
+        #     {
+        #         "types": '["PHONE","EMAIL","SECURE_MESSAGE"]',
+        #         "sub_types": '["INBOUND","OUTBOUND"]',
+        #         "skip": 0,
+        #         "paginate": 1000
+        #     }
+        # ),
+        # ("tasks", None),
+        # ("accounts", None),
+        # ("timeentries", None),
+        # ("expenses", None),
+        # ("flatfees", None),
+        # ("activities", None),  # alias Categories
+        # (
+        #     "reports/payment-collected",
+        #     {
+        #         "user_id": "",
+        #         "practice_id": "",
+        #         "client_id": "",
+        #         "matter_id": "",
+        #         "start": "",
+        #         "end": "",
+        #         "selected_accounts": ""
+        #     }
+        # ),
+        # (
+        #     "reports/invoice-history",
+        #     {
+        #         "user_id": "",
+        #         "group_by": "",
+        #         "practice_id": "",
+        #         "client_id": "",
+        #         "start": "",
+        #         "end": ""
+        #     }
+        # ),
+        # (
+        #     "reports/matter-balance",
+        #     {
+        #         "user_id": "",
+        #         "group_by": "",
+        #         "practice_id": "",
+        #         "client_id": "",
+        #         "start": "",
+        #         "end": "",
+        #         "trust": ""
+        #     }
+        # ),
+        # (
+        #     "reports/client-trust",
+        #     {
+        #         "client_id": "",
+        #         "start": "",
+        #         "end": "",
+        #         "display_zero": "",
+        #         "practice_id": "",
+        #     }
+        # ),
+        # (
+        #     "reports/client-ledger",
+        #     {
+        #         "practice_id": "",
+        #         "client_id": "",
+        #         "start": "",
+        #         "end": "",
+        #     }
+        # ),
+        # (
+        #     "reports/trust-ledger",
+        #     {
+        #         "account_id": "",
+        #         "practice_id": "",
+        #         "client_id": "",
+        #         "matter_id": "",
+        #         "start": "",
+        #         "end": "",
+        #         "display_zero": "",
+        #     }
+        # ),
+        # (
+        #     "reports/time-entries",
+        #     {
+        #         "group_by": "",
+        #         "user_id": "",
+        #         "matter_id": "",
+        #         "start": "",
+        #         "end": "",
+        #         "status": "",
+        #     }
+        # ),
+        # (
+        #     "reports/revenue",
+        #     {
+        #         "matter_id": "",
+        #         "client_id": "",
+        #         "user_id": "",
+        #         "start": "",
+        #         "end": "",
+        #     }
+        # ),
+        # (
+        #     "reports/accounts-receivable",
+        #     {
+        #         "user_id": "",
+        #         "group_by": "",
+        #         "practice_id": "",
+        #         "client_id": "",
+        #         "matter_id": "",
+        #         "start": "",
+        #         "end": "",
+        #     }
+        # ),
+        # ("reports/matters/info", None),
+        # ("users/me", None),
+        # ("users/teammates", None),
+        # ("users/team", None),
+        # (
+        #     "users/data/contacts",
+        #     {
+        #         "take": "",
+        #         "skip": "",
+        #         "updated_after": "",  # {{YYYY-MM-DD HH:MM:SS}}
+        #     }
+        # ),
+        # (
+        #     "users/data/matters",
+        #     {
+        #         "take": "",
+        #         "skip": "",
+        #         "status": "",  # OPEN , LEAD , ARCHIVED , NOT_HIRED
+        #         "updated_after": "",  # YYYY-MM-DD HH:MM:SS
+        #     }
+        # ),
     ]
 
     for endpoint, params in endpoints:
@@ -330,7 +331,13 @@ if __name__ == "__main__":
                 insert_contacts_into_table(oracle_cursor, endpoint_data["list"])
             elif endpoint == "matters":
                 create_matters_table(oracle_cursor)
+                create_matter_assignees_table(oracle_cursor)
+                create_matter_custom_field_table(oracle_cursor)
+                create_matter_tags_table(oracle_cursor)
                 truncate_table(oracle_cursor, "LAWCUS_MATTERS")
+                truncate_table(oracle_cursor, "LAWCUS_MATTER_ASSIGNEES")
+                truncate_table(oracle_cursor, "LAWCUS_MATTER_CUSTOM_FIELD")
+                truncate_table(oracle_cursor, "LAWCUS_MATTER_TAGS")
                 insert_matters_into_table(oracle_cursor, endpoint_data)
             elif endpoint == "leadsources":
                 create_leads_table(oracle_cursor)

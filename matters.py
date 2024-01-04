@@ -1,4 +1,5 @@
-from utils import table_exists, add_prefix_to_keys
+from utils import table_exists
+import json
 
 
 def create_matters_table(cursor):
@@ -15,7 +16,6 @@ def create_matters_table(cursor):
             MATTER_ID VARCHAR2(4000),
             UUID VARCHAR2(4000),
             COLOR_CODE VARCHAR2(4000),
-            TAGS VARCHAR2(4000),
             CREATED_BY VARCHAR2(4000),
             CLOSE_DATE VARCHAR2(4000),
             NAME VARCHAR2(4000),
@@ -78,6 +78,102 @@ def create_matters_table(cursor):
         print("Matters table already exists.")
 
 
+def create_matter_assignees_table(cursor):
+    """
+    Create a table for Matter Assignees in the Oracle database if it doesn't exist.
+
+    Modify the table creation query based on your specific requirements.
+    """
+    table_name = "LAWCUS_MATTER_ASSIGNEES"
+
+    if not table_exists(cursor, table_name):
+        table_creation_query = """
+        CREATE TABLE LAWCUS_MATTER_ASSIGNEES (
+            MATTER_ID VARCHAR2(4000),
+            ASSIGNEES VARCHAR2(4000)
+        )
+        """
+        cursor.execute(table_creation_query)
+        print("Matter Assignees table created successfully.")
+    else:
+        print("Matter Assignees table already exists.")
+
+
+def create_matter_custom_field_table(cursor):
+    """
+    Create a table for Matter Custom Field in the Oracle database if it doesn't exist.
+
+    Modify the table creation query based on your specific requirements.
+    """
+    table_name = "LAWCUS_MATTER_CUSTOM_FIELD"
+
+    if not table_exists(cursor, table_name):
+        table_creation_query = """
+        CREATE TABLE LAWCUS_MATTER_CUSTOM_FIELD (
+            MATTER_ID VARCHAR2(4000),
+            TYPE VARCHAR2(4000),
+            NAME VARCHAR2(4000),
+            IFDEFAULT VARCHAR2(4000),
+            ISREQUIRED VARCHAR2(4000),
+            PRACTICE_IDS VARCHAR2(4000),
+            VALUE VARCHAR2(4000)
+        )
+        """
+        cursor.execute(table_creation_query)
+        print("Matter Custom Field table created successfully.")
+    else:
+        print("Matter Custom Field table already exists.")
+
+
+def create_matter_tags_table(cursor):
+    """
+    Create a table for Matter Tags in the Oracle database if it doesn't exist.
+
+    Modify the table creation query based on your specific requirements.
+    """
+    table_name = "LAWCUS_MATTER_TAGS"
+
+    if not table_exists(cursor, table_name):
+        table_creation_query = """
+        CREATE TABLE LAWCUS_MATTER_TAGS (
+            MATTER_ID VARCHAR2(4000),
+            NAME VARCHAR2(4000),
+            COLOR VARCHAR2(4000)
+        )
+        """
+        cursor.execute(table_creation_query)
+        print("Matter Tags table created successfully.")
+    else:
+        print("Matter Tags table already exists.")
+
+
+def insert_matter_tags_into_table(cursor, matter_id, tags):
+    """
+    Insert Matter Tag data into the Oracle database.
+
+    Modify the insert query based on your specific requirements.
+    """
+    try:
+        tags_list = json.loads(tags)
+    except json.JSONDecodeError:
+        print(f"Error decoding JSON for matter_id {matter_id}: {tags}")
+        return
+
+    for tag in tags_list:
+        cursor.execute(
+            """
+            INSERT INTO LAWCUS_MATTER_TAGS (MATTER_ID, NAME, COLOR)
+            VALUES (:matter_id, :name, :color)
+            """,
+            matter_id=matter_id,
+            name=tag.get("name"),
+            color=tag.get("color")
+        )
+
+    cursor.connection.commit()
+    print("Matter Tags inserted into the table successfully.")
+
+
 def insert_matters_into_table(cursor, matters):
     """
     Insert matter data into the Oracle database.
@@ -86,7 +182,7 @@ def insert_matters_into_table(cursor, matters):
     """
     insert_query = """
     INSERT INTO LAWCUS_MATTERS (
-        MATTER_ID, UUID, COLOR_CODE, TAGS, CREATED_BY, CLOSE_DATE, NAME, POSITION,
+        MATTER_ID, UUID, COLOR_CODE, CREATED_BY, CLOSE_DATE, NAME, POSITION,
         STAGE_ID, IS_PRIVATE, PRACTICE, DISPLAY_NUMBER, RATES, NUMBERS, DESCRIPTION,
         STATUS, CLOSED_AT, LEAD_CREATED_AT, NOT_HIRE_AT, BILLING_TYPE, OPEN_DATE,
         DUE_DATE, STAGE_POSITION, ARCHIVED, STAGENAME, LOCATION, LOCATION_ID,
@@ -99,7 +195,7 @@ def insert_matters_into_table(cursor, matters):
         WORKFLOW_ID, CLIENT_ID, EVERGREEN_RETAINER_AMOUNT, IS_USE_EVERGREEN_RETAINER,
         LAST_CONTACTED_AT, WORKFLOWNAME, ASSIGNID, LAWCUS_URL
     ) VALUES (
-        :my_id, :my_uuid, :my_color_code, :my_tags, :my_created_by, :my_close_date, :my_name, :my_position,
+        :my_id, :my_uuid, :my_color_code, :my_created_by, :my_close_date, :my_name, :my_position,
         :my_stage_id, :my_is_private, :my_practice, :my_display_number, :my_rates, :my_number, :my_description,
         :my_status, :my_closed_at, :my_lead_created_at, :my_not_hire_at, :my_billing_type, :my_open_date,
         :my_due_date, :my_stage_position, :my_archived, :my_stagename, :my_location, :my_location_id,
@@ -115,74 +211,107 @@ def insert_matters_into_table(cursor, matters):
     """
 
     for matter in matters:
-        prefixed_content = add_prefix_to_keys(matter)
+        # Extract assignees and custom_fields arrays
+        assignees = matter.get("assignees", [])
+        custom_fields = matter.get("custom_fields")
+
+        # Insert assignees into LAWCUS_MATTER_ASSIGNEES
+        for assignee in assignees:
+            cursor.execute(
+                """
+                INSERT INTO LAWCUS_MATTER_ASSIGNEES (MATTER_ID, ASSIGNEES)
+                VALUES (:my_matter_id, :my_assignee)
+                """,
+                my_matter_id=matter.get("id"),
+                my_assignee=assignee
+            )
+
+        # Insert custom_fields into LAWCUS_MATTER_CUSTOM_FIELD
+        if custom_fields is not None:
+            for custom_field in custom_fields:
+                cursor.execute(
+                    """
+                    INSERT INTO LAWCUS_MATTER_CUSTOM_FIELD (MATTER_ID, TYPE, NAME, IFDEFAULT, ISREQUIRED, PRACTICE_IDS, VALUE)
+                    VALUES (:my_matter_id, :my_type,:my_name, :my_ifdefault, :my_isrequired, :my_practice_ids, :my_value)
+                    """,
+                    my_matter_id=matter.get("id"),
+                    my_type=custom_field.get("type"),
+                    my_name=custom_field.get("name"),
+                    my_ifdefault=custom_field.get("ifdefault"),
+                    my_isrequired=custom_field.get("isrequired"),
+                    my_practice_ids=custom_field.get("practice_ids"),
+                    my_value=custom_field.get("value")
+                )
+
+        # Insert Matter Tags into LAWCUS_MATTER_TAGS
+        tags = matter.get("tags")
+        if tags is not None:
+            insert_matter_tags_into_table(cursor, matter.get("id"), tags)
 
         # Convert lists to a string joined by ';;'
-        for key, value in prefixed_content.items():
+        for key, value in matter.items():
             if isinstance(value, list):
-                prefixed_content[key] = ';;'.join(map(str, value))
+                matter[key] = ';;'.join(map(str, value))
 
         cursor.execute(
             insert_query,
-            my_id=prefixed_content.get("my_id"),
-            my_uuid=prefixed_content.get("my_uuid"),
-            my_color_code=prefixed_content.get("my_color_code"),
-            my_tags=prefixed_content.get("my_tags"),
-            my_created_by=prefixed_content.get("my_created_by"),
-            my_close_date=prefixed_content.get("my_close_date"),
-            my_name=prefixed_content.get("my_name"),
-            my_position=prefixed_content.get("my_position"),
-            my_stage_id=prefixed_content.get("my_stage_id"),
-            my_is_private=prefixed_content.get("my_is_private"),
-            my_practice=prefixed_content.get("my_practice"),
-            my_display_number=prefixed_content.get("my_display_number"),
-            my_rates=prefixed_content.get("my_rates"),
-            my_number=prefixed_content.get("my_number"),
-            my_description=prefixed_content.get("my_description"),
-            my_status=prefixed_content.get("my_status"),
-            my_closed_at=prefixed_content.get("my_closed_at"),
-            my_lead_created_at=prefixed_content.get("my_lead_created_at"),
-            my_not_hire_at=prefixed_content.get("my_not_hire_at"),
-            my_billing_type=prefixed_content.get("my_billing_type"),
-            my_open_date=prefixed_content.get("my_open_date"),
-            my_due_date=prefixed_content.get("my_due_date"),
-            my_stage_position=prefixed_content.get("my_stage_position"),
-            my_archived=prefixed_content.get("my_archived"),
-            my_stagename=prefixed_content.get("my_stagename"),
-            my_location=prefixed_content.get("my_location"),
-            my_location_id=prefixed_content.get("my_location_id"),
-            my_rate=prefixed_content.get("my_rate"),
-            my_estimated_cost=prefixed_content.get("my_estimated_cost"),
-            my_settlement_amount=prefixed_content.get("my_settlement_amount"),
-            my_billing_attorney_id=prefixed_content.get("my_billing_attorney_id"),
-            my_not_hire_reason=prefixed_content.get("my_not_hire_reason"),
-            my_not_hire_note=prefixed_content.get("my_not_hire_note"),
-            my_practice_name=prefixed_content.get("my_practice_name"),
-            my_client_reference_number=prefixed_content.get("my_client_reference_number"),
-            my_converted_at=prefixed_content.get("my_converted_at"),
-            my_integration=prefixed_content.get("my_integration"),
-            my_box_folder_id=prefixed_content.get("my_box_folder_id"),
-            my_box_shared_link=prefixed_content.get("my_box_shared_link"),
-            my_originating_timekeeper_id=prefixed_content.get("my_originating_timekeeper_id"),
-            my_responsible_attorney_id=prefixed_content.get("my_responsible_attorney_id"),
-            my_google_drive_folder_id=prefixed_content.get("my_google_drive_folder_id"),
-            my_one_drive_folder_id=prefixed_content.get("my_one_drive_folder_id"),
-            my_starred=prefixed_content.get("my_starred"),
-            my_document_count=prefixed_content.get("my_document_count"),
-            my_comments_count=prefixed_content.get("my_comments_count"),
-            my_completed_tasks_count=prefixed_content.get("my_completed_tasks_count"),
-            my_uncompleted_tasks_count=prefixed_content.get("my_uncompleted_tasks_count"),
-            my_relations=prefixed_content.get("my_relations"),
-            my_team_id=prefixed_content.get("my_team_id"),
-            my_workflow_id=prefixed_content.get("my_workflow_id"),
-            my_client_id=prefixed_content.get("my_client_id"),
-            my_evergreen_retainer_amount=prefixed_content.get("my_evergreen_retainer_amount"),
-            my_is_use_evergreen_retainer=prefixed_content.get("my_is_use_evergreen_retainer"),
-            my_last_contacted_at=prefixed_content.get("my_last_contacted_at"),
-            my_workflowname=prefixed_content.get("my_workflowname"),
-            my_assignId=prefixed_content.get("my_assignId"),
-            my_lawcus_url=prefixed_content.get("my_lawcus_url"),
+            my_id=matter.get("id"),
+            my_uuid=matter.get("uuid"),
+            my_color_code=matter.get("color_code"),
+            my_created_by=matter.get("created_by"),
+            my_close_date=matter.get("close_date"),
+            my_name=matter.get("name"),
+            my_position=matter.get("position"),
+            my_stage_id=matter.get("stage_id"),
+            my_is_private=matter.get("is_private"),
+            my_practice=matter.get("practice"),
+            my_display_number=matter.get("display_number"),
+            my_rates=matter.get("rates"),
+            my_number=matter.get("number"),
+            my_description=matter.get("description"),
+            my_status=matter.get("status"),
+            my_closed_at=matter.get("closed_at"),
+            my_lead_created_at=matter.get("lead_created_at"),
+            my_not_hire_at=matter.get("not_hire_at"),
+            my_billing_type=matter.get("billing_type"),
+            my_open_date=matter.get("open_date"),
+            my_due_date=matter.get("due_date"),
+            my_stage_position=matter.get("stage_position"),
+            my_archived=matter.get("archived"),
+            my_stagename=matter.get("stagename"),
+            my_location=matter.get("location"),
+            my_location_id=matter.get("location_id"),
+            my_rate=matter.get("rate"),
+            my_estimated_cost=matter.get("estimated_cost"),
+            my_settlement_amount=matter.get("settlement_amount"),
+            my_billing_attorney_id=matter.get("billing_attorney_id"),
+            my_not_hire_reason=matter.get("not_hire_reason"),
+            my_not_hire_note=matter.get("not_hire_note"),
+            my_practice_name=matter.get("practice_name"),
+            my_client_reference_number=matter.get("client_reference_number"),
+            my_converted_at=matter.get("converted_at"),
+            my_integration=matter.get("integration"),
+            my_box_folder_id=matter.get("box_folder_id"),
+            my_box_shared_link=matter.get("box_shared_link"),
+            my_originating_timekeeper_id=matter.get("originating_timekeeper_id"),
+            my_responsible_attorney_id=matter.get("responsible_attorney_id"),
+            my_google_drive_folder_id=matter.get("google_drive_folder_id"),
+            my_one_drive_folder_id=matter.get("one_drive_folder_id"),
+            my_starred=matter.get("starred"),
+            my_document_count=matter.get("document_count"),
+            my_comments_count=matter.get("comments_count"),
+            my_completed_tasks_count=matter.get("completed_tasks_count"),
+            my_uncompleted_tasks_count=matter.get("uncompleted_tasks_count"),
+            my_relations=matter.get("relations"),
+            my_team_id=matter.get("team_id"),
+            my_workflow_id=matter.get("workflow_id"),
+            my_client_id=matter.get("client_id"),
+            my_evergreen_retainer_amount=matter.get("evergreen_retainer_amount"),
+            my_is_use_evergreen_retainer=matter.get("is_use_evergreen_retainer"),
+            my_last_contacted_at=matter.get("last_contacted_at"),
+            my_workflowname=matter.get("workflowname"),
+            my_assignId=matter.get("assignId"),
+            my_lawcus_url=matter.get("lawcus_url"),
         )
     cursor.connection.commit()
     print("Matters inserted into the table successfully.")
-
