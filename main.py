@@ -11,7 +11,7 @@ from interactions import create_interactions_table, insert_interactions_into_tab
 from leads import create_leads_table, insert_leads_into_table
 from matters import create_matters_table, insert_matters_into_table, create_matter_assignees_table, \
     create_matter_tags_table, create_matter_custom_field_table, create_matter_assign_id_table
-from tasks import create_tasks_table, insert_tasks_into_table, create_task_tags_table
+from tasks import create_tasks_table, insert_tasks_into_table, create_task_tags_table, create_task_due_settings_table
 from activities import create_activity_category_table, create_activity_flat_fees_table, \
     insert_activity_flat_fees_into_table, insert_activity_time_entries_into_table, create_activity_time_entry_table, \
     create_activity_expenses_table, insert_activity_category_into_table, insert_activity_expenses_into_table, \
@@ -367,8 +367,10 @@ if __name__ == "__main__":
                 elif endpoint == "tasks":
                     create_tasks_table(oracle_cursor)
                     create_task_tags_table(oracle_cursor)
+                    create_task_due_settings_table(oracle_cursor)
                     truncate_table(oracle_cursor, "LAWCUS_TASKS")
                     truncate_table(oracle_cursor, "LAWCUS_TASK_TAGS")
+                    truncate_table(oracle_cursor, "LAWCUS_TASK_DUE_SETTINGS")
                     insert_tasks_into_table(oracle_cursor, endpoint_data)
                 elif endpoint == "accounts":
                     create_accounts_table(oracle_cursor)
