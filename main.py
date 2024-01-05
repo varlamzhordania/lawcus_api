@@ -178,144 +178,144 @@ if __name__ == "__main__":
 
     # Define the endpoints and parameters you need to call
     endpoints = [
-        # ("contacts", None),
-        # ("matters", None),
-        # ("leadsources", None),
-        # (
-        #     "interactions",
-        #     {
-        #         "types": '["PHONE","EMAIL","SECURE_MESSAGE"]',
-        #         "sub_types": '["INBOUND","OUTBOUND"]',
-        #         "skip": 0,
-        #         "paginate": 1000
-        #     }
-        # ),
-        # ("tasks", None),
-        # ("accounts", None),
-        # ("timeentries", None),
-        # ("expenses", None),
-        # ("flatfees", None),
-        # ("activities", None),  # alias Categories
-        # (
-        #     "reports/payment-collected",
-        #     {
-        #         "user_id": "",
-        #         "practice_id": "",
-        #         "client_id": "",
-        #         "matter_id": "",
-        #         "start": "",
-        #         "end": "",
-        #         "selected_accounts": ""
-        #     }
-        # ),
-        # (
-        #     "reports/invoice-history",
-        #     {
-        #         "user_id": "",
-        #         "group_by": "",
-        #         "practice_id": "",
-        #         "client_id": "",
-        #         "start": "",
-        #         "end": ""
-        #     }
-        # ),
-        # (
-        #     "reports/matter-balance",
-        #     {
-        #         "user_id": "",
-        #         "group_by": "",
-        #         "practice_id": "",
-        #         "client_id": "",
-        #         "start": "",
-        #         "end": "",
-        #         "trust": ""
-        #     }
-        # ),
-        # (
-        #     "reports/client-trust",
-        #     {
-        #         "client_id": "",
-        #         "start": "",
-        #         "end": "",
-        #         "display_zero": "",
-        #         "practice_id": "",
-        #     }
-        # ),
-        # (
-        #     "reports/client-ledger",
-        #     {
-        #         "practice_id": "",
-        #         "client_id": "",
-        #         "start": "",
-        #         "end": "",
-        #     }
-        # ),
-        # (
-        #     "reports/trust-ledger",
-        #     {
-        #         "account_id": "",
-        #         "practice_id": "",
-        #         "client_id": "",
-        #         "matter_id": "",
-        #         "start": "",
-        #         "end": "",
-        #         "display_zero": "",
-        #     }
-        # ),
-        # (
-        #     "reports/time-entries",
-        #     {
-        #         "group_by": "",
-        #         "user_id": "",
-        #         "matter_id": "",
-        #         "start": "",
-        #         "end": "",
-        #         "status": "",
-        #     }
-        # ),
-        # (
-        #     "reports/revenue",
-        #     {
-        #         "matter_id": "",
-        #         "client_id": "",
-        #         "user_id": "",
-        #         "start": "",
-        #         "end": "",
-        #     }
-        # ),
-        # (
-        #     "reports/accounts-receivable",
-        #     {
-        #         "user_id": "",
-        #         "group_by": "",
-        #         "practice_id": "",
-        #         "client_id": "",
-        #         "matter_id": "",
-        #         "start": "",
-        #         "end": "",
-        #     }
-        # ),
-        # ("reports/matters/info", None),
-        # ("users/me", None),
-        # ("users/teammates", None),
-        # ("users/team", None),
-        # (
-        #     "users/data/contacts",
-        #     {
-        #         "take": "",
-        #         "skip": "",
-        #         "updated_after": "",  # {{YYYY-MM-DD HH:MM:SS}}
-        #     }
-        # ),
-        # (
-        #     "users/data/matters",
-        #     {
-        #         "take": "",
-        #         "skip": "",
-        #         "status": "",  # OPEN , LEAD , ARCHIVED , NOT_HIRED
-        #         "updated_after": "",  # YYYY-MM-DD HH:MM:SS
-        #     }
-        # ),
+        ("contacts", None),
+        ("matters", None),
+        ("leadsources", None),
+        (
+            "interactions",
+            {
+                "types": '["PHONE","EMAIL","SECURE_MESSAGE"]',
+                "sub_types": '["INBOUND","OUTBOUND"]',
+                "skip": 0,
+                "paginate": 1000
+            }
+        ),
+        ("tasks", None),
+        ("accounts", None),
+        ("timeentries", None),
+        ("expenses", None),
+        ("flatfees", None),
+        ("activities", None),  # alias Categories
+        (
+            "reports/payment-collected",
+            {
+                "user_id": "",
+                "practice_id": "",
+                "client_id": "",
+                "matter_id": "",
+                "start": "",
+                "end": "",
+                "selected_accounts": ""
+            }
+        ),
+        (
+            "reports/invoice-history",
+            {
+                "user_id": "",
+                "group_by": "",
+                "practice_id": "",
+                "client_id": "",
+                "start": "",
+                "end": ""
+            }
+        ),
+        (
+            "reports/matter-balance",
+            {
+                "user_id": "",
+                "group_by": "",
+                "practice_id": "",
+                "client_id": "",
+                "start": "",
+                "end": "",
+                "trust": ""
+            }
+        ),
+        (
+            "reports/client-trust",
+            {
+                "client_id": "",
+                "start": "",
+                "end": "",
+                "display_zero": "",
+                "practice_id": "",
+            }
+        ),
+        (
+            "reports/client-ledger",
+            {
+                "practice_id": "",
+                "client_id": "",
+                "start": "",
+                "end": "",
+            }
+        ),
+        (
+            "reports/trust-ledger",
+            {
+                "account_id": "",
+                "practice_id": "",
+                "client_id": "",
+                "matter_id": "",
+                "start": "",
+                "end": "",
+                "display_zero": "",
+            }
+        ),
+        (
+            "reports/time-entries",
+            {
+                "group_by": "",
+                "user_id": "",
+                "matter_id": "",
+                "start": "",
+                "end": "",
+                "status": "",
+            }
+        ),
+        (
+            "reports/revenue",
+            {
+                "matter_id": "",
+                "client_id": "",
+                "user_id": "",
+                "start": "",
+                "end": "",
+            }
+        ),
+        (
+            "reports/accounts-receivable",
+            {
+                "user_id": "",
+                "group_by": "",
+                "practice_id": "",
+                "client_id": "",
+                "matter_id": "",
+                "start": "",
+                "end": "",
+            }
+        ),
+        ("reports/matters/info", None),
+        ("users/me", None),
+        ("users/teammates", None),
+        ("users/team", None),
+        (
+            "users/data/contacts",
+            {
+                "take": "",
+                "skip": "",
+                "updated_after": "",  # {{YYYY-MM-DD HH:MM:SS}}
+            }
+        ),
+        (
+            "users/data/matters",
+            {
+                "take": "",
+                "skip": "",
+                "status": "",  # OPEN , LEAD , ARCHIVED , NOT_HIRED
+                "updated_after": "",  # YYYY-MM-DD HH:MM:SS
+            }
+        ),
     ]
 
     if access_token and endpoints:
