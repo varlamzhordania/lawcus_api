@@ -4,13 +4,14 @@ import oracledb
 import requests
 from logger import logger
 from utils import make_token_request, exchange_authorization_code_for_token, get_authorization_code_url, truncate_table
-from contacts import create_contact_table, insert_contacts_into_table
+from contacts import create_contact_table, insert_contacts_into_table, create_contact_phones_table, \
+    create_contact_address_table, create_emails_table, create_contact_tags_table
 from accounts import create_accounts_table, insert_accounts_into_table
 from interactions import create_interactions_table, insert_interactions_into_table
 from leads import create_leads_table, insert_leads_into_table
 from matters import create_matters_table, insert_matters_into_table, create_matter_assignees_table, \
-    create_matter_tags_table, create_matter_custom_field_table
-from tasks import create_tasks_table, insert_tasks_into_table
+    create_matter_tags_table, create_matter_custom_field_table, create_matter_assign_id_table
+from tasks import create_tasks_table, insert_tasks_into_table, create_task_tags_table
 from activities import create_activity_category_table, create_activity_flat_fees_table, \
     insert_activity_flat_fees_into_table, insert_activity_time_entries_into_table, create_activity_time_entry_table, \
     create_activity_expenses_table, insert_activity_category_into_table, insert_activity_expenses_into_table, \
@@ -19,7 +20,8 @@ from users import create_users_me_table, create_users_team_table, create_users_m
     insert_users_matters_into_table, insert_users_me_into_table, create_users_contacts_table, \
     create_users_teammates_table, insert_users_teammates_into_table, insert_users_contacts_into_table, \
     insert_users_team_into_table, create_users_matter_tags_table, create_users_matter_custom_field_table, \
-    create_users_matter_assignees_table
+    create_users_matter_assignees_table, create_users_matter_assign_id_table, create_users_emails_table, \
+    create_users_contact_tags_table, create_users_contact_address_table, create_users_contact_phones_table
 from reports import create_reports_matters_info_table, insert_reports_matters_info_into_table, \
     insert_reports_accounts_receivable_into_table, create_reports_client_trust_table, create_reports_time_entries_table, \
     insert_reports_client_trust_into_table, insert_reports_matter_balance_into_table, \
@@ -332,17 +334,27 @@ if __name__ == "__main__":
                 # Execute the corresponding function based on the endpoint
                 if endpoint == "contacts":
                     create_contact_table(oracle_cursor)
+                    create_contact_address_table(oracle_cursor)
+                    create_contact_phones_table(oracle_cursor)
+                    create_contact_tags_table(oracle_cursor)
+                    create_emails_table(oracle_cursor)
                     truncate_table(oracle_cursor, "LAWCUS_CONTACTS")
+                    truncate_table(oracle_cursor, "LAWCUS_CONTACT_ADDRESS")
+                    truncate_table(oracle_cursor, "LAWCUS_CONTACT_PHONES")
+                    truncate_table(oracle_cursor, "LAWCUS_CONTACT_TAGS")
+                    truncate_table(oracle_cursor, "LAWCUS_CONTACT_EMAILS")
                     insert_contacts_into_table(oracle_cursor, endpoint_data["list"])
                 elif endpoint == "matters":
                     create_matters_table(oracle_cursor)
                     create_matter_assignees_table(oracle_cursor)
                     create_matter_custom_field_table(oracle_cursor)
                     create_matter_tags_table(oracle_cursor)
+                    create_matter_assign_id_table(oracle_cursor)
                     truncate_table(oracle_cursor, "LAWCUS_MATTERS")
                     truncate_table(oracle_cursor, "LAWCUS_MATTER_ASSIGNEES")
                     truncate_table(oracle_cursor, "LAWCUS_MATTER_CUSTOM_FIELD")
                     truncate_table(oracle_cursor, "LAWCUS_MATTER_TAGS")
+                    truncate_table(oracle_cursor, "LAWCUS_MATTER_ASSIGN_ID")
                     insert_matters_into_table(oracle_cursor, endpoint_data)
                 elif endpoint == "leadsources":
                     create_leads_table(oracle_cursor)
@@ -354,7 +366,9 @@ if __name__ == "__main__":
                     insert_interactions_into_table(oracle_cursor, endpoint_data["list"])
                 elif endpoint == "tasks":
                     create_tasks_table(oracle_cursor)
+                    create_task_tags_table(oracle_cursor)
                     truncate_table(oracle_cursor, "LAWCUS_TASKS")
+                    truncate_table(oracle_cursor, "LAWCUS_TASK_TAGS")
                     insert_tasks_into_table(oracle_cursor, endpoint_data)
                 elif endpoint == "accounts":
                     create_accounts_table(oracle_cursor)
@@ -430,17 +444,27 @@ if __name__ == "__main__":
                     insert_users_team_into_table(oracle_cursor, endpoint_data)
                 elif endpoint == "users/data/contacts":
                     create_users_contacts_table(oracle_cursor)
+                    create_users_contact_address_table(oracle_cursor)
+                    create_users_contact_phones_table(oracle_cursor)
+                    create_users_contact_tags_table(oracle_cursor)
+                    create_users_emails_table(oracle_cursor)
                     truncate_table(oracle_cursor, "LAWCUS_USERS_CONTACTS")
+                    truncate_table(oracle_cursor, "LAWCUS_USERS_CONTACT_ADDRESS")
+                    truncate_table(oracle_cursor, "LAWCUS_USERS_CONTACT_PHONES")
+                    truncate_table(oracle_cursor, "LAWCUS_USERS_CONTACT_TAGS")
+                    truncate_table(oracle_cursor, "LAWCUS_USERS_CONTACT_EMAILS")
                     insert_users_contacts_into_table(oracle_cursor, endpoint_data)
                 elif endpoint == "users/data/matters":
                     create_users_matters_table(oracle_cursor)
                     create_users_matter_tags_table(oracle_cursor)
                     create_users_matter_custom_field_table(oracle_cursor)
                     create_users_matter_assignees_table(oracle_cursor)
+                    create_users_matter_assign_id_table(oracle_cursor)
                     truncate_table(oracle_cursor, "LAWCUS_USERS_MATTERS")
                     truncate_table(oracle_cursor, "LAWCUS_USERS_MATTER_ASSIGNEES")
                     truncate_table(oracle_cursor, "LAWCUS_USERS_MATTER_CF")
                     truncate_table(oracle_cursor, "LAWCUS_USERS_MATTER_TAGS")
+                    truncate_table(oracle_cursor, "LAWCUS_USERS_MATTER_ASSIGN_ID")
                     insert_users_matters_into_table(oracle_cursor, endpoint_data)
             else:
                 print(

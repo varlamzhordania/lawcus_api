@@ -237,7 +237,6 @@ def create_users_contacts_table(cursor):
                 SOURCE VARCHAR2(4000),
                 TYPE VARCHAR2(4000),
                 EMAIL VARCHAR2(4000),
-                EMAILS VARCHAR2(4000),
                 AVATAR VARCHAR2(4000),
                 STREET VARCHAR2(4000),
                 CITY VARCHAR2(4000),
@@ -245,16 +244,13 @@ def create_users_contacts_table(cursor):
                 ZIP VARCHAR2(4000),
                 COUNTRY VARCHAR2(4000),
                 NUMBERS VARCHAR2(4000),
-                TAGS VARCHAR2(4000),
                 SOURCE_ID VARCHAR2(4000),
                 REFERRED_BY VARCHAR2(4000),
                 PREFIX VARCHAR2(4000),
                 GENDER VARCHAR2(4000),
                 DATE_OF_BIRTHDAY VARCHAR2(4000),
                 NOTE VARCHAR2(4000),
-                ADDRESSES VARCHAR2(4000),
                 PHONE VARCHAR2(4000),
-                PHONES VARCHAR2(4000),
                 IS_LEAD VARCHAR2(4000),
                 CUSTOM_FIELDS VARCHAR2(4000),
                 COMPANY_ID VARCHAR2(4000),
@@ -271,30 +267,290 @@ def create_users_contacts_table(cursor):
         logger.error(f"Error creating LAWOCUS Users Contacts table: {e}")
 
 
+def create_users_contact_address_table(cursor):
+    """
+    Create a table for Users Contact Addresses in the Oracle database if it doesn't exist.
+
+    Modify the table creation query based on your specific requirements.
+    """
+    table_name = "LAWCUS_USERS_CONTACT_ADDRESS"
+
+    try:
+        if not table_exists(cursor, table_name):
+            table_creation_query = """
+            CREATE TABLE LAWCUS_USERS_CONTACT_ADDRESS (
+                CONTACT_ID VARCHAR2(4000),
+                IS_PRIMARY VARCHAR2(4000),
+                TYPE VARCHAR2(4000),
+                STREET VARCHAR2(4000),
+                CITY VARCHAR2(4000),
+                STATE VARCHAR2(4000),
+                ZIP VARCHAR2(4000),
+                COUNTRY VARCHAR2(4000)
+            )
+            """
+            cursor.execute(table_creation_query)
+            logger.info("Users Contact address table created successfully.")
+        else:
+            logger.info("Users Contact address table already exists.")
+    except Exception as e:
+        logger.error(f"Error creating users contact address table: {e}")
+
+
+def create_users_contact_phones_table(cursor):
+    """
+    Create a table for Users Contact Phones in the Oracle database if it doesn't exist.
+
+    Modify the table creation query based on your specific requirements.
+    """
+    table_name = "LAWCUS_USERS_CONTACT_PHONES"
+
+    try:
+        if not table_exists(cursor, table_name):
+            table_creation_query = """
+            CREATE TABLE LAWCUS_USERS_CONTACT_PHONES (
+                CONTACT_ID VARCHAR2(4000),
+                TYPE VARCHAR2(4000),
+                VALUE VARCHAR2(4000),
+                IS_PRIMARY VARCHAR2(4000)
+            )
+            """
+            cursor.execute(table_creation_query)
+            logger.info("Users Contact phones table created successfully.")
+        else:
+            logger.info("Users Contact phones table already exists.")
+    except Exception as e:
+        logger.error(f"Error creating users contact phones table: {e}")
+
+
+def create_users_contact_tags_table(cursor):
+    """
+    Create a table for Users Contact Tags in the Oracle database if it doesn't exist.
+
+    Modify the table creation query based on your specific requirements.
+    """
+    table_name = "LAWCUS_USERS_CONTACT_TAGS"
+
+    try:
+        if not table_exists(cursor, table_name):
+            table_creation_query = """
+            CREATE TABLE LAWCUS_USERS_CONTACT_TAGS (
+                CONTACT_ID VARCHAR2(4000),
+                NAME VARCHAR2(4000),
+                COLOR VARCHAR2(4000)
+            )
+            """
+            cursor.execute(table_creation_query)
+            logger.info("Contact  tags table created successfully.")
+        else:
+            logger.info("Contact tags table already exists.")
+    except Exception as e:
+        logger.error(f"Error creating contact tags table: {e}")
+
+
+def create_users_emails_table(cursor):
+    """
+    Create a table for Users Contact Emails in the Oracle database if it doesn't exist.
+
+    Modify the table creation query based on your specific requirements.
+    """
+    table_name = "LAWCUS_USERS_CONTACT_EMAILS"
+
+    try:
+        if not table_exists(cursor, table_name):
+            table_creation_query = """
+            CREATE TABLE LAWCUS_USERS_CONTACT_EMAILS (
+                CONTACT_ID VARCHAR2(4000),
+                EMAIL_TYPE VARCHAR2(4000),
+                EMAIL_VALUE VARCHAR2(4000),
+                IS_PRIMARY VARCHAR2(4000)
+            )
+            """
+            cursor.execute(table_creation_query)
+            logger.info("Contact emails table created successfully.")
+        else:
+            logger.info("Contact Emails table already exists.")
+    except Exception as e:
+        logger.error(f"Error creating contact emails table: {e}")
+
+
+def insert_users_contact_addresses_into_table(cursor, contact_id, addresses):
+    """
+    Insert Users Contact address data into the Oracle database.
+
+    Modify the insert query based on your specific requirements.
+    """
+
+    insert_query = """
+        INSERT INTO LAWCUS_USERS_CONTACT_ADDRESS (
+            CONTACT_ID, IS_PRIMARY, TYPE, STREET, CITY, STATE, ZIP, COUNTRY
+        ) VALUES (
+            :my_contact_id, :my_is_primary, :my_type, :my_street, :my_city, :my_state, :my_zip, :my_country
+        )
+        """
+
+    try:
+        for address in addresses:
+            # Execute the query with parameters
+            cursor.execute(
+                insert_query,
+                my_contact_id=contact_id,
+                my_is_primary=address.get("is_primary"),
+                my_type=address.get("type"),
+                my_street=address.get("street"),
+                my_city=address.get("city"),
+                my_state=address.get("state"),
+                my_zip=address.get("zip"),
+                my_country=address.get("country")
+            )
+
+        cursor.connection.commit()
+        logger.info("Contact addresses inserted into the table successfully.")
+    except Exception as e:
+        logger.error(f"Error inserting contact addresses into the table: {e}")
+
+
+def insert_users_contact_phones_into_table(cursor, contact_id, phones):
+    """
+    Insert Users Contact phone data into the Oracle database.
+
+    Modify the insert query based on your specific requirements.
+    """
+
+    insert_query = """
+        INSERT INTO LAWCUS_USERS_CONTACT_PHONES (
+            CONTACT_ID, TYPE, VALUE, IS_PRIMARY
+        ) VALUES (
+            :my_contact_id, :my_type, :my_value, :my_is_primary
+        )
+        """
+
+    try:
+        for phone in phones:
+            # Execute the query with parameters
+            cursor.execute(
+                insert_query,
+                my_contact_id=contact_id,
+                my_type=phone.get("type"),
+                my_value=phone.get("value"),
+                my_is_primary=phone.get("is_primary")
+            )
+
+        cursor.connection.commit()
+        logger.info("Contact phones inserted into the table successfully.")
+    except Exception as e:
+        logger.error(f"Error inserting contact phones into the table: {e}")
+
+
+def insert_users_contact_tags_into_table(cursor, contact_id, tags):
+    """
+    Insert Users Contact tag data into the Oracle database.
+
+    Modify the insert query based on your specific requirements.
+    """
+    # Define the parameterized query
+    insert_query = """
+        INSERT INTO LAWCUS_USERS_CONTACT_TAGS (
+            CONTACT_ID, NAME, COLOR
+        ) VALUES (
+            :my_contact_id, :my_name, :my_color
+        )
+        """
+
+    try:
+        for tag in tags:
+            # Execute the query with parameters
+            cursor.execute(
+                insert_query,
+                my_contact_id=contact_id,
+                my_name=tag.get("name"),
+                my_color=tag.get("color")
+            )
+
+        cursor.connection.commit()
+        logger.info("Contact tags inserted into the table successfully.")
+    except Exception as e:
+        logger.error(f"Error inserting contact tags into the table: {e}")
+
+
+def insert_users_emails_into_table(cursor, contact_id, emails):
+    """
+    Insert Users contact email data into the Oracle database.
+
+    Modify the insert query based on your specific requirements.
+    """
+
+    insert_query = """
+        INSERT INTO LAWCUS_USERS_CONTACT_EMAILS (
+            CONTACT_ID, EMAIL_TYPE, EMAIL_VALUE, IS_PRIMARY
+        ) VALUES (
+            :contact_id, :email_type, :email_value, :is_primary
+        )
+        """
+
+    try:
+        for email in emails:
+            # Execute the query with parameters
+            cursor.execute(
+                insert_query,
+                contact_id=contact_id,
+                email_type=email.get("type"),
+                email_value=email.get("value"),
+                is_primary=str(email.get("is_primary"))
+            )
+
+        cursor.connection.commit()
+        logger.info("Contact emails inserted into the table successfully.")
+    except Exception as e:
+        logger.error(f"Error inserting contact emails into the table: {e}")
+
+
 def insert_users_contacts_into_table(cursor, contacts_data):
     """
-    Insert LAWOCUS Users Contacts data into the Oracle database.
+    Insert Users Contacts data into the Oracle database.
 
     Modify the insert query based on your specific requirements.
     """
     insert_query = """
     INSERT INTO LAWCUS_USERS_CONTACTS (
-        USER_ID, UUID, NAME, FIRST_NAME, MIDDLE_NAME, LAST_NAME, SOURCE, TYPE, EMAIL, EMAILS,
-        AVATAR, STREET, CITY, STATE, ZIP, COUNTRY, NUMBERS, TAGS, SOURCE_ID, REFERRED_BY,
-        PREFIX, GENDER, DATE_OF_BIRTHDAY, NOTE, ADDRESSES, PHONE, PHONES, IS_LEAD,
+        USER_ID, UUID, NAME, FIRST_NAME, MIDDLE_NAME, LAST_NAME, SOURCE, TYPE, EMAIL,
+        AVATAR, STREET, CITY, STATE, ZIP, COUNTRY, NUMBERS, SOURCE_ID, REFERRED_BY,
+        PREFIX, GENDER, DATE_OF_BIRTHDAY, NOTE, PHONE, IS_LEAD,
         CUSTOM_FIELDS, COMPANY_ID, ASSOCIATED_USER_ID, LAST_CONTACTED_AT, IS_CLIENT
     ) VALUES (
         :my_id, :my_uuid, :my_name, :my_first_name, :my_middle_name, :my_last_name,
-        :my_source, :my_type, :my_email, :my_emails, :my_avatar, :my_street, :my_city,
-        :my_state, :my_zip, :my_country, :my_number, :my_tags, :my_source_id, :my_referred_by,
-        :my_prefix, :my_gender, :my_date_of_birthday, :my_note, :my_addresses, :my_phone,
-        :my_phones, :my_is_lead, :my_custom_fields, :my_company_id, :my_associated_user_id,
+        :my_source, :my_type, :my_email, :my_avatar, :my_street, :my_city,
+        :my_state, :my_zip, :my_country, :my_number, :my_source_id, :my_referred_by,
+        :my_prefix, :my_gender, :my_date_of_birthday, :my_note, :my_phone,
+        :my_is_lead, :my_custom_fields, :my_company_id, :my_associated_user_id,
         :my_last_contacted_at, :my_is_client
     )
     """
 
     try:
         for contact in contacts_data:
+
+            contact_id = contact.get("id")
+            addresses_json = contact.get("addresses", '[]')
+            phones_json = contact.get("phones", '[]')
+            tags_json = contact.get("tags") or '[]'
+            emails_json = contact.get("emails", '[]')
+
+            if addresses_json is not None:
+                addresses = json.loads(addresses_json)
+                insert_users_contact_addresses_into_table(cursor, contact_id, addresses)
+
+            if phones_json is not None:
+                phones = json.loads(phones_json)
+                insert_users_contact_phones_into_table(cursor, contact_id, phones)
+
+            if tags_json is not None:
+                tags = json.loads(tags_json)
+                insert_users_contact_tags_into_table(cursor, contact_id, tags)
+
+            if emails_json is not None:
+                emails = json.loads(emails_json)
+                insert_users_emails_into_table(cursor, contact_id, emails)
 
             # Convert lists to a string joined by ';;'
             for key, value in contact.items():
@@ -303,7 +559,7 @@ def insert_users_contacts_into_table(cursor, contacts_data):
 
             cursor.execute(
                 insert_query,
-                my_id=contact.get("id"),
+                my_id=contact_id,
                 my_uuid=contact.get("uuid"),
                 my_name=contact.get("name"),
                 my_first_name=contact.get("first_name"),
@@ -312,7 +568,6 @@ def insert_users_contacts_into_table(cursor, contacts_data):
                 my_source=contact.get("source"),
                 my_type=contact.get("type"),
                 my_email=contact.get("email"),
-                my_emails=contact.get("emails"),
                 my_avatar=contact.get("avatar"),
                 my_street=contact.get("street"),
                 my_city=contact.get("city"),
@@ -320,16 +575,13 @@ def insert_users_contacts_into_table(cursor, contacts_data):
                 my_zip=contact.get("zip"),
                 my_country=contact.get("country"),
                 my_number=contact.get("number"),
-                my_tags=contact.get("tags"),
                 my_source_id=contact.get("source_id"),
                 my_referred_by=contact.get("referred_by"),
                 my_prefix=contact.get("prefix"),
                 my_gender=contact.get("gender"),
                 my_date_of_birthday=contact.get("date_of_birthday"),
                 my_note=contact.get("note"),
-                my_addresses=contact.get("addresses"),
                 my_phone=contact.get("phone"),
-                my_phones=contact.get("phones"),
                 my_is_lead=contact.get("is_lead"),
                 my_custom_fields=contact.get("custom_fields"),
                 my_company_id=contact.get("company_id"),
@@ -339,9 +591,9 @@ def insert_users_contacts_into_table(cursor, contacts_data):
             )
 
         cursor.connection.commit()
-        logger.info("LAWCUS Users Contacts data inserted into the table successfully.")
+        logger.info("Users Contacts data inserted into the table successfully.")
     except Exception as e:
-        logger.error(f"Error inserting LAWOCUS Users Contacts data into the table: {e}")
+        logger.error(f"Error inserting Users Contacts data into the table: {e}")
 
 
 def create_users_matters_table(cursor):
@@ -396,7 +648,6 @@ def create_users_matters_table(cursor):
                 IS_USE_EVERGREEN_RETAINER VARCHAR2(4000),
                 WORKFLOWNAME VARCHAR2(4000),
                 RELATIONS VARCHAR2(4000),
-                ASSIGN_ID VARCHAR2(4000),
                 STARRED VARCHAR2(4000),
                 COMPLETED_TASKS_COUNT VARCHAR2(4000),
                 UNCOMPLETED_TASKS_COUNT VARCHAR2(4000),
@@ -491,6 +742,31 @@ def create_users_matter_tags_table(cursor):
         logger.error(f"Error creating Users Matter Tags table: {e}")
 
 
+def create_users_matter_assign_id_table(cursor):
+    """
+    Create a table for Users Matter Assign ID in the Oracle database if it doesn't exist.
+
+    Modify the table creation query based on your specific requirements.
+    """
+
+    table_name = "LAWCUS_USERS_MATTER_ASSIGN_ID"
+
+    try:
+        if not table_exists(cursor, table_name):
+            table_creation_query = """
+            CREATE TABLE LAWCUS_USERS_MATTER_ASSIGN_ID (
+                MATTER_ID VARCHAR2(4000),
+                ASSIGN_ID VARCHAR2(4000)
+            )
+            """
+            cursor.execute(table_creation_query)
+            logger.info("Users Matter Assign ID table created successfully.")
+        else:
+            logger.info("Users Matter Assign ID table already exists.")
+    except Exception as e:
+        logger.error(f"Error creating Users Matter Assign ID table: {e}")
+
+
 def insert_users_matter_tags_into_table(cursor, matter_id, tags):
     """
     Insert Users Matter Tag data into the Oracle database.
@@ -536,7 +812,7 @@ def insert_users_matters_into_table(cursor, matters_data):
         LEAD_CREATED_AT, LOCATION, LOCATION_ID, ARCHIVED, TEAM_ID,
         WORKFLOW_ID, CLIENT_ID, CLIENT_REFERRED_BY, CLIENT_SOURCE_ID, ESTIMATED_COST,
         TASK_DUE_DATE, EVERGREEN_RETAINER_AMOUNT, IS_USE_EVERGREEN_RETAINER,
-        WORKFLOWNAME, RELATIONS, ASSIGN_ID, STARRED,
+        WORKFLOWNAME, RELATIONS, STARRED,
         COMPLETED_TASKS_COUNT, UNCOMPLETED_TASKS_COUNT, LAST_CONTACTED_AT,
         DOCUMENT_COUNT, LAWCUS_URL
     ) VALUES (
@@ -549,7 +825,7 @@ def insert_users_matters_into_table(cursor, matters_data):
         :my_archived, :my_team_id, :my_workflow_id, :my_client_id, :my_client_referred_by,
         :my_client_source_id, :my_estimated_cost, :my_task_due_date, :my_evergreen_retainer_amount,
         :my_is_use_evergreen_retainer, :my_workflowname, :my_relations,
-        :my_assign_id, :my_starred, :my_completed_tasks_count, :my_uncompleted_tasks_count,
+        :my_starred, :my_completed_tasks_count, :my_uncompleted_tasks_count,
         :my_last_contacted_at, :my_document_count, :my_lawcus_url
     )
     """
@@ -559,6 +835,7 @@ def insert_users_matters_into_table(cursor, matters_data):
             # Extract assignees and custom_fields arrays
             assignees = matter.get("assignees", [])
             custom_fields = matter.get("custom_fields")
+            assign_ids = matter.get("assignId", [])
 
             # Insert assignees into LAWCUS_USERS_MATTER_ASSIGNEES
             for assignee in assignees:
@@ -589,9 +866,20 @@ def insert_users_matters_into_table(cursor, matters_data):
                     )
 
             # Insert Matter Tags into LAWCUS_USERS_MATTER_TAGS
-            tags = matter.get("tags")
+            tags = matter.get("tags") or '[]'
             if tags is not None:
                 insert_users_matter_tags_into_table(cursor, matter.get("id"), tags)
+
+            # Insert assignees into LAWCUS_USERS_MATTER_ASSIGN_ID
+            for assign_id in assign_ids:
+                cursor.execute(
+                    """
+                    INSERT INTO LAWCUS_USERS_MATTER_ASSIGN_ID (MATTER_ID, ASSIGN_ID)
+                    VALUES (:my_matter_id, :my_assign_id)
+                    """,
+                    my_matter_id=matter.get("id"),
+                    my_assign_id=assign_id
+                )
 
             # Convert lists to a string joined by ';;'
             for key, value in matter.items():
@@ -640,7 +928,6 @@ def insert_users_matters_into_table(cursor, matters_data):
                 my_is_use_evergreen_retainer=matter.get("is_use_evergreen_retainer"),
                 my_workflowname=matter.get("workflowname"),
                 my_relations=matter.get("relations"),
-                my_assign_id=matter.get("assign_id"),
                 my_starred=matter.get("starred"),
                 my_completed_tasks_count=matter.get("completed_tasks_count"),
                 my_uncompleted_tasks_count=matter.get("uncompleted_tasks_count"),

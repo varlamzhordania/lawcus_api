@@ -70,7 +70,6 @@ def create_matters_table(cursor):
                 IS_USE_EVERGREEN_RETAINER VARCHAR2(4000),
                 LAST_CONTACTED_AT VARCHAR2(4000),
                 WORKFLOWNAME VARCHAR2(4000),
-                ASSIGNID VARCHAR2(4000),
                 LAWCUS_URL VARCHAR2(4000)
             )
             """
@@ -160,6 +159,31 @@ def create_matter_tags_table(cursor):
         logger.error(f"Error creating Matter Tags table: {e}")
 
 
+def create_matter_assign_id_table(cursor):
+    """
+    Create a table for Matter Assign ID in the Oracle database if it doesn't exist.
+
+    Modify the table creation query based on your specific requirements.
+    """
+
+    table_name = "LAWCUS_MATTER_ASSIGN_ID"
+
+    try:
+        if not table_exists(cursor, table_name):
+            table_creation_query = """
+            CREATE TABLE LAWCUS_MATTER_ASSIGN_ID (
+                MATTER_ID VARCHAR2(4000),
+                ASSIGN_ID VARCHAR2(4000)
+            )
+            """
+            cursor.execute(table_creation_query)
+            logger.info("Matter Assign ID table created successfully.")
+        else:
+            logger.info("Matter Assign ID table already exists.")
+    except Exception as e:
+        logger.error(f"Error creating Matter Assign ID table: {e}")
+
+
 def insert_matter_tags_into_table(cursor, matter_id, tags):
     """
     Insert Matter Tag data into the Oracle database.
@@ -208,7 +232,7 @@ def insert_matters_into_table(cursor, matters):
         ONE_DRIVE_FOLDER_ID, STARRED, DOCUMENT_COUNT, COMMENTS_COUNT,
         COMPLETED_TASKS_COUNT, UNCOMPLETED_TASKS_COUNT, RELATIONS, TEAM_ID,
         WORKFLOW_ID, CLIENT_ID, EVERGREEN_RETAINER_AMOUNT, IS_USE_EVERGREEN_RETAINER,
-        LAST_CONTACTED_AT, WORKFLOWNAME, ASSIGNID, LAWCUS_URL
+        LAST_CONTACTED_AT, WORKFLOWNAME, LAWCUS_URL
     ) VALUES (
         :my_id, :my_uuid, :my_color_code, :my_created_by, :my_close_date, :my_name, :my_position,
         :my_stage_id, :my_is_private, :my_practice, :my_display_number, :my_rates, :my_number, :my_description,
@@ -221,15 +245,17 @@ def insert_matters_into_table(cursor, matters):
         :my_one_drive_folder_id, :my_starred, :my_document_count, :my_comments_count,
         :my_completed_tasks_count, :my_uncompleted_tasks_count, :my_relations, :my_team_id,
         :my_workflow_id, :my_client_id, :my_evergreen_retainer_amount, :my_is_use_evergreen_retainer,
-        :my_last_contacted_at, :my_workflowname, :my_assignId, :my_lawcus_url
+        :my_last_contacted_at, :my_workflowname, :my_lawcus_url
     )
     """
 
     try:
         for matter in matters:
+
             # Extract assignees and custom_fields arrays
             assignees = matter.get("assignees", [])
             custom_fields = matter.get("custom_fields")
+            assign_ids = matter.get("assignId", [])
 
             # Insert assignees into LAWCUS_MATTER_ASSIGNEES
             for assignee in assignees:
@@ -260,9 +286,21 @@ def insert_matters_into_table(cursor, matters):
                     )
 
             # Insert Matter Tags into LAWCUS_MATTER_TAGS
-            tags = matter.get("tags")
+            tags = matter.get("tags") or '[]'
             if tags is not None:
                 insert_matter_tags_into_table(cursor, matter.get("id"), tags)
+
+            # Insert assignees into LAWCUS_MATTER_ASSIGN_ID
+            for assign_id in assign_ids:
+                cursor.execute(
+                    """
+                    INSERT INTO LAWCUS_MATTER_ASSIGN_ID (MATTER_ID, ASSIGN_ID)
+                    VALUES (:my_matter_id, :my_assign_id)
+                    """,
+                    my_matter_id=matter.get("id"),
+                    my_assign_id=assign_id
+                )
+
 
             # Convert lists to a string joined by ';;'
             for key, value in matter.items():
@@ -326,11 +364,9 @@ def insert_matters_into_table(cursor, matters):
                 my_is_use_evergreen_retainer=matter.get("is_use_evergreen_retainer"),
                 my_last_contacted_at=matter.get("last_contacted_at"),
                 my_workflowname=matter.get("workflowname"),
-                my_assignId=matter.get("assignId"),
                 my_lawcus_url=matter.get("lawcus_url"),
             )
         cursor.connection.commit()
         logger.info("Matters inserted into the table successfully.")
     except Exception as e:
         logger.error(f"Error inserting matters into the table: {e}")
-
