@@ -140,7 +140,7 @@ if __name__ == "__main__":
     # Define Lawcus API credentials
     client_id = '03d45512d01041eea358c505bdbfe4a2'
     redirect_uri = 'https://www.lawkpis.com/oauth'
-    static_auth_code = "b0417aa0aa1d11eea53a2b13a8761e06"
+    static_auth_code = "4b84d9f0ac9011eea9aed3d9e7b14144"
     client_secret = '81f88e344bad4b68ad0e8d98dafdb0a56bec332fa2cd4172b97391b1f621cb55'
     state = ''  # Optional
 
