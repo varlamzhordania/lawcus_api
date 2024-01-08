@@ -5,7 +5,7 @@ import requests
 from logger import logger
 from utils import make_token_request, exchange_authorization_code_for_token, get_authorization_code_url, truncate_table
 from contacts import create_contact_table, insert_contacts_into_table, create_contact_phones_table, \
-    create_contact_address_table, create_emails_table, create_contact_tags_table
+    create_contact_address_table, create_emails_table, create_contact_tags_table,create_contact_custom_field_table
 from accounts import create_accounts_table, insert_accounts_into_table
 from interactions import create_interactions_table, insert_interactions_into_table
 from leads import create_leads_table, insert_leads_into_table
@@ -98,17 +98,17 @@ def make_api_request(endpoint, params=None, base_url=None, headers=None, **kwarg
 
 if __name__ == "__main__":
     # Placeholder database connection parameters
-    DB_USERNAME = "root"  # Replace with your DB username
-    DB_PASSWORD = "1234"  # Replace with your DB password
-    DB_HOST = "localhost"  # Replace with your DB host
-    DB_PORT = 1521
-    DB_SID = "xe"  # Replace with your DB SID
+    # DB_USERNAME = "root"  # Replace with your DB username
+    # DB_PASSWORD = "1234"  # Replace with your DB password
+    # DB_HOST = "localhost"  # Replace with your DB host
+    # DB_PORT = 1521
+    # DB_SID = "xe"  # Replace with your DB SID
 
-    # DB_USERNAME = "Lawcus_Source"
-    # DB_PASSWORD = "thidlwk2lerierol33"
-    # DB_HOST = " eztestprod.ctv3czkgd3ce.us-west-2.rds.amazonaws.com"
-    # DB_PORT = 1526
-    # DB_SID = "eztest"
+    DB_USERNAME = "Lawcus_Source"
+    DB_PASSWORD = "thidlwk2lerierol33"
+    DB_HOST = " eztestprod.ctv3czkgd3ce.us-west-2.rds.amazonaws.com"
+    DB_PORT = 1526
+    DB_SID = "eztest"
 
     # Connect to the Oracle database
 
@@ -338,11 +338,13 @@ if __name__ == "__main__":
                     create_contact_phones_table(oracle_cursor)
                     create_contact_tags_table(oracle_cursor)
                     create_emails_table(oracle_cursor)
+                    create_contact_custom_field_table(oracle_cursor)
                     truncate_table(oracle_cursor, "LAWCUS_CONTACTS")
                     truncate_table(oracle_cursor, "LAWCUS_CONTACT_ADDRESS")
                     truncate_table(oracle_cursor, "LAWCUS_CONTACT_PHONES")
                     truncate_table(oracle_cursor, "LAWCUS_CONTACT_TAGS")
                     truncate_table(oracle_cursor, "LAWCUS_CONTACT_EMAILS")
+                    truncate_table(oracle_cursor, "LAWCUS_CONTACT_CUSTOM_FIELD")
                     insert_contacts_into_table(oracle_cursor, endpoint_data["list"])
                 elif endpoint == "matters":
                     create_matters_table(oracle_cursor)

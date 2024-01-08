@@ -37,7 +37,6 @@ def create_contact_table(cursor):
                 AVATAR VARCHAR2(4000),
                 TEAM_ID VARCHAR2(4000),
                 COMPANY_ID VARCHAR2(4000),
-                CUSTOM_FIELDS VARCHAR2(4000),
                 INTEGRATION VARCHAR2(4000),
                 INTEGRATION_ID VARCHAR2(4000),
                 BOX_FOLDER_ID VARCHAR2(4000),
@@ -179,6 +178,35 @@ def create_emails_table(cursor):
             logger.info("Contact Emails table already exists.")
     except Exception as e:
         logger.error(f"Error creating contact emails table: {e}")
+
+
+def create_contact_custom_field_table(cursor):
+    """
+    Create a table for Contact Custom Field in the Oracle database if it doesn't exist.
+
+    Modify the table creation query based on your specific requirements.
+    """
+    table_name = "LAWCUS_CONTACT_CUSTOM_FIELD"
+
+    try:
+        if not table_exists(cursor, table_name):
+            table_creation_query = """
+            CREATE TABLE LAWCUS_CONTACT_CUSTOM_FIELD (
+                CONTACT_ID VARCHAR2(4000),
+                TYPE VARCHAR2(4000),
+                NAME VARCHAR2(4000),
+                IFDEFAULT VARCHAR2(4000),
+                ISREQUIRED VARCHAR2(4000),
+                PRACTICE_IDS VARCHAR2(4000),
+                VALUE VARCHAR2(4000)
+            )
+            """
+            cursor.execute(table_creation_query)
+            logger.info("Contact Custom Field table created successfully.")
+        else:
+            logger.info("Contact Custom Field table already exists.")
+    except Exception as e:
+        logger.error(f"Error creating contact Custom Field table: {e}")
 
 
 def insert_contact_addresses_into_table(cursor, contact_id, addresses):
@@ -324,7 +352,7 @@ def insert_contacts_into_table(cursor, contacts):
             CONTACT_ID, CONTACT_TYPE, NAME, FIRST_NAME, MIDDLE_NAME, LAST_NAME,
             TITLE, EMAIL, WEBSITE, HOME_PHONE, WORK_PHONE, MOBILE, FAX,
             HOME_ADDRESS, WORK_ADDRESS, CREATED_BY, CREATED_AT, UPDATED_AT,
-            UUID, AVATAR, TEAM_ID, COMPANY_ID, CUSTOM_FIELDS, INTEGRATION,
+            UUID, AVATAR, TEAM_ID, COMPANY_ID, INTEGRATION,
             INTEGRATION_ID, BOX_FOLDER_ID, BOX_SHARED_LINK, NUMBERS, QUICKBOOKS_ID,
             GOOGLE_DRIVE_FOLDER_ID, ONE_DRIVE_FOLDER_ID,   
             PHONE, STREET, CITY, STATE, ZIP, COUNTRY, SOURCE, SOURCE_ID,
@@ -335,7 +363,7 @@ def insert_contacts_into_table(cursor, contacts):
             :my_title, :my_email, :my_website, :my_home_phone, :my_work_phone, :my_mobile, :my_fax,
             :my_home_address, :my_work_address, :my_created_by, :my_created_at,
             :my_updated_at, :my_uuid, :my_avatar, :my_team_id,
-            :my_company_id, :my_custom_fields, :my_integration, :my_integration_id, :my_box_folder_id,
+            :my_company_id, :my_integration, :my_integration_id, :my_box_folder_id,
             :my_box_shared_link, :my_number, :my_quickbooks_id, :my_google_drive_folder_id,
             :my_one_drive_folder_id, :my_phone,
             :my_street, :my_city, :my_state, :my_zip, :my_country, :my_source, :my_source_id, :my_referred_by,
@@ -349,6 +377,7 @@ def insert_contacts_into_table(cursor, contacts):
             contact_id = contact.get("id")
             addresses_json = contact.get("addresses", '[]')
             phones_json = contact.get("phones", '[]')
+            custom_fields_json = contact.get("custom_fields",'[]')
             tags_json = contact.get("tags") or '[]'
             emails_json = contact.get("emails", '[]')
 
@@ -367,6 +396,24 @@ def insert_contacts_into_table(cursor, contacts):
             if emails_json is not None:
                 emails = json.loads(emails_json)
                 insert_emails_into_table(cursor, contact_id, emails)
+
+            # Insert custom_fields into LAWCUS_CONTACT_CUSTOM_FIELD
+            if custom_fields_json is not None:
+                custom_fields = json.loads(custom_fields_json)
+                for custom_field in custom_fields:
+                    cursor.execute(
+                        """
+                        INSERT INTO LAWCUS_CONTACT_CUSTOM_FIELD (CONTACT_ID, TYPE, NAME, IFDEFAULT, ISREQUIRED, PRACTICE_IDS, VALUE)
+                        VALUES (:my_contact_id, :my_type,:my_name, :my_ifdefault, :my_isrequired, :my_practice_ids, :my_value)
+                        """,
+                        my_contact_id=contact_id,
+                        my_type=custom_field.get("type"),
+                        my_name=custom_field.get("name"),
+                        my_ifdefault=custom_field.get("ifdefault"),
+                        my_isrequired=custom_field.get("isrequired"),
+                        my_practice_ids=custom_field.get("practice_ids"),
+                        my_value=custom_field.get("value")
+                    )
 
             # Execute the query with parameters
 
@@ -394,7 +441,6 @@ def insert_contacts_into_table(cursor, contacts):
                 my_avatar=contact.get("avatar"),
                 my_team_id=contact.get("team_id"),
                 my_company_id=contact.get("company_id"),
-                my_custom_fields=contact.get("custom_fields"),
                 my_integration=contact.get("integration"),
                 my_integration_id=contact.get("integration_id"),
                 my_box_folder_id=contact.get("box_folder_id"),
