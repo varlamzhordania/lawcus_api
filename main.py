@@ -3,9 +3,10 @@ import platform
 import oracledb
 import requests
 from logger import logger
-from utils import make_token_request, exchange_authorization_code_for_token, get_authorization_code_url, truncate_table
+from utils import make_token_request, exchange_authorization_code_for_token, get_authorization_code_url, truncate_table, \
+    send_email
 from contacts import create_contact_table, insert_contacts_into_table, create_contact_phones_table, \
-    create_contact_address_table, create_emails_table, create_contact_tags_table,create_contact_custom_field_table
+    create_contact_address_table, create_emails_table, create_contact_tags_table, create_contact_custom_field_table
 from accounts import create_accounts_table, insert_accounts_into_table
 from interactions import create_interactions_table, insert_interactions_into_table
 from leads import create_leads_table, insert_leads_into_table
@@ -93,6 +94,10 @@ def make_api_request(endpoint, params=None, base_url=None, headers=None, **kwarg
         return data
     except requests.exceptions.RequestException as e:
         logger.error(f"Error making API request to {endpoint}: {e}")
+        send_email(
+            "Python Sync Failed",
+            f"Error making API request to {endpoint}: {e}"
+            )
         return None
 
 
@@ -474,6 +479,8 @@ if __name__ == "__main__":
                 print(
                     f"Failed to initiate data insertion process for endpoint '{endpoint}' because the retrieved data is None."
                 )
+                # Call this function when API sync fails
+                send_email("Python Sync Failed", f"Failed to initiate data insertion process for endpoint '{endpoint}' because the retrieved data is None.")
     else:
         print(
             "Please ensure that the access token is valid and the required endpoints exist. "

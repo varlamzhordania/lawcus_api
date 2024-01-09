@@ -1,5 +1,7 @@
 import requests
 from logger import logger
+import smtplib
+from email.mime.text import MIMEText
 
 
 def table_exists(cursor, table_name):
@@ -140,3 +142,24 @@ def refresh_access_token(client_id, client_secret, refresh_token, redirect_uri):
     }
 
     return make_token_request(token_url, data)
+
+
+def send_email(subject, message):
+    from_email = "support@lawkpis.com"
+    to_email = "contact@lawkpis.com"
+    email_username = "support@lawkpis.com"
+    email_password = "gbnmpjwnqwpvnsgs"
+    smtp_server = "smtp.office365.com"
+    port = 587
+
+    msg = MIMEText(message)
+    msg['Subject'] = subject
+    msg['From'] = from_email
+    msg['To'] = to_email
+
+    with smtplib.SMTP(smtp_server, port) as server:
+        server.starttls()
+        server.login(email_username, email_password)
+        server.sendmail(from_email, to_email, msg.as_string())
+
+
