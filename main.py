@@ -97,7 +97,7 @@ def make_api_request(endpoint, params=None, base_url=None, headers=None, **kwarg
         send_email(
             "Python Sync Failed",
             f"Error making API request to {endpoint}: {e}"
-            )
+        )
         return None
 
 
@@ -157,9 +157,11 @@ if __name__ == "__main__":
         print(f"Get authorization code from this URL: {authorization_code_url}")
 
         # Allow the user to input authorization code, using the default if not provided
-        authorization_code = input(
-            "Enter the authorization code (leave it empty to use default): "
-        ) or static_auth_code
+        # authorization_code = input(
+        #     "Enter the authorization code (leave it empty to use default): "
+        # ) or static_auth_code
+
+        authorization_code = static_auth_code
 
         # Exchange authorization code for an access token
         token_data = exchange_authorization_code_for_token(
@@ -480,7 +482,10 @@ if __name__ == "__main__":
                     f"Failed to initiate data insertion process for endpoint '{endpoint}' because the retrieved data is None."
                 )
                 # Call this function when API sync fails
-                send_email("Python Sync Failed", f"Failed to initiate data insertion process for endpoint '{endpoint}' because the retrieved data is None.")
+                send_email(
+                    "Python Sync Failed",
+                    f"Failed to initiate data insertion process for endpoint '{endpoint}' because the retrieved data is None."
+                    )
     else:
         print(
             "Please ensure that the access token is valid and the required endpoints exist. "
