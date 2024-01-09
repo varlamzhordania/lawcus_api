@@ -405,7 +405,7 @@ if __name__ == "__main__":
                 elif endpoint == "reports/matter-balance":
                     create_reports_matter_balance_table(oracle_cursor)
                     truncate_table(oracle_cursor, "LAWCUS_REPORTS_MATTER_BALANCE")
-                    # insert_reports_matter_balance_into_table(oracle_cursor, endpoint_data)
+                    insert_reports_matter_balance_into_table(oracle_cursor, endpoint_data)
                 elif endpoint == "reports/client-trust":
                     create_reports_client_trust_table(oracle_cursor)
                     truncate_table(oracle_cursor, "LAWCUS_REPORTS_CLIENT_TRUST")

@@ -243,7 +243,7 @@ def insert_reports_invoice_history_into_table(cursor, invoice_history_report):
 
 def create_reports_matter_balance_table(cursor):
     """
-    Create a table for LAWOCUS Reports Matter Balance in the Oracle database if it doesn't exist.
+    Create a table for LAWCUS Reports Matter Balance in the Oracle database if it doesn't exist.
 
     Modify the table creation query based on your specific requirements.
     """
@@ -277,7 +277,7 @@ def create_reports_matter_balance_table(cursor):
 
 def insert_reports_matter_balance_into_table(cursor, matter_balance_reports):
     """
-    Insert LAWOCUS Reports Matter Balance data into the Oracle database.
+    Insert LAWCUS Reports Matter Balance data into the Oracle database.
 
     Modify the insert query based on your specific requirements.
     """
@@ -294,29 +294,30 @@ def insert_reports_matter_balance_into_table(cursor, matter_balance_reports):
     """
 
     try:
+        import json
         for matter_balance_report in matter_balance_reports:
-            for matters_data in matter_balance_report:
-                for matter_data in matters_data.get("matters", []):
-                    cursor.execute(
-                        insert_query,
-                        my_key=matters_data.get("key"),
-                        my_matter_id=matter_data.get("matter_id"),
-                        my_matter_name=matter_data.get("matter_name"),
-                        my_description=matter_data.get("description"),
-                        my_display_number=matter_data.get("display_number"),
-                        my_client_id=matter_data.get("client_id"),
-                        my_responsible_attorney_id=matter_data.get("responsible_attorney_id"),
-                        my_receivable=matter_data.get("receivable"),
-                        my_expenses_in_work=matter_data.get("expenses_in_work"),
-                        my_time_entry_in_work=matter_data.get("time_entry_in_work"),
-                        my_flat_fee_in_work=matter_data.get("flat_fee_in_work"),
-                        my_trust=matters_data.get("trust"),
-                    )
+            key = matter_balance_report.get("key")
+            for matter_data in matter_balance_report.get("matters", []):
+                cursor.execute(
+                    insert_query,
+                    my_key=key,
+                    my_matter_id=matter_data.get("id"),
+                    my_matter_name=matter_data.get("name"),
+                    my_description=matter_data.get("description"),
+                    my_display_number=matter_data.get("display_number"),
+                    my_client_id=matter_data.get("client_id"),
+                    my_responsible_attorney_id=matter_data.get("responsible_attorney_id"),
+                    my_receivable=matter_data.get("receivable"),
+                    my_expenses_in_work=matter_data.get("expenses_in_work"),
+                    my_time_entry_in_work=matter_data.get("time_entry_in_work"),
+                    my_flat_fee_in_work=matter_data.get("flat_fee_in_work"),
+                    my_trust=matter_balance_report.get("trust",''),
+                )
 
         cursor.connection.commit()
         logger.info("LAWCUS Reports Matter Balance data inserted into the table successfully.")
     except Exception as e:
-        logger.error(f"Error inserting LAWOCUS Reports Matter Balance data into the table: {e}")
+        logger.error(f"Error inserting LAWCUS Reports Matter Balance data into the table: {e}")
 
 
 def create_reports_client_trust_table(cursor):
