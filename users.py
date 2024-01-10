@@ -341,11 +341,11 @@ def create_users_contact_tags_table(cursor):
             )
             """
             cursor.execute(table_creation_query)
-            logger.info("Contact  tags table created successfully.")
+            logger.info("Users Contact  tags table created successfully.")
         else:
-            logger.info("Contact tags table already exists.")
+            logger.info("Users Contact tags table already exists.")
     except Exception as e:
-        logger.error(f"Error creating contact tags table: {e}")
+        logger.error(f"Error creating users contact tags table: {e}")
 
 
 def create_users_emails_table(cursor):
@@ -367,11 +367,11 @@ def create_users_emails_table(cursor):
             )
             """
             cursor.execute(table_creation_query)
-            logger.info("Contact emails table created successfully.")
+            logger.info("Users Contact emails table created successfully.")
         else:
-            logger.info("Contact Emails table already exists.")
+            logger.info("Users Contact Emails table already exists.")
     except Exception as e:
-        logger.error(f"Error creating contact emails table: {e}")
+        logger.error(f"Error creating users contact emails table: {e}")
 
 
 def insert_users_contact_addresses_into_table(cursor, contact_id, addresses):
@@ -405,9 +405,9 @@ def insert_users_contact_addresses_into_table(cursor, contact_id, addresses):
             )
 
         cursor.connection.commit()
-        logger.info("Contact addresses inserted into the table successfully.")
+        logger.info("Users Contact addresses inserted into the table successfully.")
     except Exception as e:
-        logger.error(f"Error inserting contact addresses into the table: {e}")
+        logger.error(f"Error inserting users contact addresses into the table: {e}")
 
 
 def insert_users_contact_phones_into_table(cursor, contact_id, phones):
@@ -437,9 +437,9 @@ def insert_users_contact_phones_into_table(cursor, contact_id, phones):
             )
 
         cursor.connection.commit()
-        logger.info("Contact phones inserted into the table successfully.")
+        logger.info("Users Contact phones inserted into the table successfully.")
     except Exception as e:
-        logger.error(f"Error inserting contact phones into the table: {e}")
+        logger.error(f"Error inserting users contact phones into the table: {e}")
 
 
 def insert_users_contact_tags_into_table(cursor, contact_id, tags):
@@ -468,9 +468,9 @@ def insert_users_contact_tags_into_table(cursor, contact_id, tags):
             )
 
         cursor.connection.commit()
-        logger.info("Contact tags inserted into the table successfully.")
+        logger.info("Users Contact tags inserted into the table successfully.")
     except Exception as e:
-        logger.error(f"Error inserting contact tags into the table: {e}")
+        logger.error(f"Error inserting users contact tags into the table: {e}")
 
 
 def insert_users_emails_into_table(cursor, contact_id, emails):
@@ -500,9 +500,9 @@ def insert_users_emails_into_table(cursor, contact_id, emails):
             )
 
         cursor.connection.commit()
-        logger.info("Contact emails inserted into the table successfully.")
+        logger.info("Users Contact emails inserted into the table successfully.")
     except Exception as e:
-        logger.error(f"Error inserting contact emails into the table: {e}")
+        logger.error(f"Error inserting users contact emails into the table: {e}")
 
 
 def insert_users_contacts_into_table(cursor, contacts_data):
