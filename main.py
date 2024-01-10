@@ -71,9 +71,17 @@ def connect_to_database(username, password, host, port, service_id):
         return cursor
     except oracledb.DatabaseError as e:
         logger.error(f"Error connecting to the database: {e}")
+        send_email(
+            "Lawcus Python Sync Failed for on",
+            f"Error connecting to the database: {e}"
+        )
         raise
     except Exception as e:
         logger.error(f"Error occurred during database connection: {e}")
+        send_email(
+            "Lawcus Python Sync Failed for on",
+            f"Error occurred during database connection: {e}"
+        )
         raise
 
 
