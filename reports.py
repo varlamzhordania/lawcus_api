@@ -1,5 +1,5 @@
 from utils import table_exists
-from logger import logger
+from logger import reports_logger as logger
 
 
 def create_reports_payment_collected_table(cursor):
@@ -311,7 +311,7 @@ def insert_reports_matter_balance_into_table(cursor, matter_balance_reports):
                     my_expenses_in_work=matter_data.get("expenses_in_work"),
                     my_time_entry_in_work=matter_data.get("time_entry_in_work"),
                     my_flat_fee_in_work=matter_data.get("flat_fee_in_work"),
-                    my_trust=matter_balance_report.get("trust",''),
+                    my_trust=matter_balance_report.get("trust", ''),
                 )
 
         cursor.connection.commit()

@@ -1,5 +1,5 @@
 from utils import table_exists
-from logger import logger
+from logger import accounts_logger as logger
 
 
 def create_accounts_table(cursor):

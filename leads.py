@@ -1,5 +1,5 @@
 from utils import table_exists
-from logger import logger
+from logger import leads_logger as logger
 
 
 def create_leads_table(cursor):

@@ -1,5 +1,5 @@
 from utils import table_exists
-from logger import logger
+from logger import activities_logger as logger
 
 
 def create_activity_time_entry_table(cursor):

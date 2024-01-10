@@ -1,7 +1,11 @@
 import requests
-from logger import logger
+from logger import app_logger as logger
 import smtplib
 from email.mime.text import MIMEText
+import configparser
+
+config = configparser.ConfigParser()
+config.read('lawcus_config.ini')
 
 
 def table_exists(cursor, table_name):
@@ -145,21 +149,32 @@ def refresh_access_token(client_id, client_secret, refresh_token, redirect_uri):
 
 
 def send_email(subject, message):
-    from_email = "support@lawkpis.com"
-    to_email = "contact@lawkpis.com"
-    email_username = "support@lawkpis.com"
-    email_password = "gbnmpjwnqwpvnsgs"
-    smtp_server = "smtp.office365.com"
-    port = 587
+    """
+    Send an email using SMTP.
 
+    :param subject: Subject of the email
+    :param message: Body of the email
+    """
+    # Email configuration
+    from_email = config['Email']['from_email']
+    to_email = config['Email']['to_email']
+    email_username = config['Email']['email_username']
+    email_password = config['Email']['email_password']
+
+    smtp_server = config['SMTP']['smtp_server']
+    port = int(config['SMTP']['port'])
+
+    # Create the email message
     msg = MIMEText(message)
     msg['Subject'] = subject
     msg['From'] = from_email
     msg['To'] = to_email
 
+    # Connect to the SMTP server and send the email
     with smtplib.SMTP(smtp_server, port) as server:
+        # Start TLS encryption
         server.starttls()
+        # Login to the email server
         server.login(email_username, email_password)
+        # Send the email
         server.sendmail(from_email, to_email, msg.as_string())
-
-

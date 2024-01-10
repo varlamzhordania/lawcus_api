@@ -1,6 +1,6 @@
 import json
 from utils import table_exists
-from logger import logger
+from logger import contacts_logger as logger
 
 
 def create_contact_table(cursor):
@@ -377,7 +377,7 @@ def insert_contacts_into_table(cursor, contacts):
             contact_id = contact.get("id")
             addresses_json = contact.get("addresses", '[]')
             phones_json = contact.get("phones", '[]')
-            custom_fields_json = contact.get("custom_fields",'[]')
+            custom_fields_json = contact.get("custom_fields", '[]')
             tags_json = contact.get("tags") or '[]'
             emails_json = contact.get("emails", '[]')
 

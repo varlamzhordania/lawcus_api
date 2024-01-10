@@ -1,6 +1,6 @@
 from utils import table_exists
 import json
-from logger import logger
+from logger import matters_logger as logger
 
 
 def create_matters_table(cursor):
@@ -300,7 +300,6 @@ def insert_matters_into_table(cursor, matters):
                     my_matter_id=matter.get("id"),
                     my_assign_id=assign_id
                 )
-
 
             # Convert lists to a string joined by ';;'
             for key, value in matter.items():

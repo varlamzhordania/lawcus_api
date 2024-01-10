@@ -1,5 +1,5 @@
 from utils import table_exists
-from logger import logger
+from logger import tasks_logger as logger
 import json
 
 
