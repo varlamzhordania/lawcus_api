@@ -25,3 +25,18 @@ endpoint_config = {
     "users/data/contacts": 1,
     "users/data/matters": 1,
 }
+
+endpoint_logger_config = {
+    "contacts": 1,
+    "matters": 1,
+    "leadsources": 1,
+    "interactions": 1,
+    "tasks": 1,
+    "accounts": 1,
+    "timeentries": 1,
+    "expenses": 1,
+    "flatfees": 1,
+    "activities": 1,
+    "reports": 1,
+    "users": 1,
+}

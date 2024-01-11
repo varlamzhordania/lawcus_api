@@ -2,6 +2,9 @@ import json
 from utils import table_exists
 from logger import contacts_logger as logger
 
+if not logger:
+    from logger import app_logger as logger
+
 
 def create_contact_table(cursor):
     """
@@ -240,7 +243,7 @@ def insert_contact_addresses_into_table(cursor, contact_id, addresses):
             )
 
         cursor.connection.commit()
-        logger.info("Contact addresses inserted into the table successfully.")
+        # logger.info("Contact addresses inserted into the table successfully.")
     except Exception as e:
         logger.error(f"Error inserting contact addresses into the table: {e}")
 
@@ -272,7 +275,7 @@ def insert_contact_phones_into_table(cursor, contact_id, phones):
             )
 
         cursor.connection.commit()
-        logger.info("Contact phones inserted into the table successfully.")
+        # logger.info("Contact phones inserted into the table successfully.")
     except Exception as e:
         logger.error(f"Error inserting contact phones into the table: {e}")
 
@@ -303,7 +306,7 @@ def insert_contact_tags_into_table(cursor, contact_id, tags):
             )
 
         cursor.connection.commit()
-        logger.info("Contact tags inserted into the table successfully.")
+        # logger.info("Contact tags inserted into the table successfully.")
     except Exception as e:
         logger.error(f"Error inserting contact tags into the table: {e}")
 
@@ -335,7 +338,7 @@ def insert_emails_into_table(cursor, contact_id, emails):
             )
 
         cursor.connection.commit()
-        logger.info("Contact emails inserted into the table successfully.")
+        # logger.info("Contact emails inserted into the table successfully.")
     except Exception as e:
         logger.error(f"Error inserting contact emails into the table: {e}")
 
@@ -373,6 +376,7 @@ def insert_contacts_into_table(cursor, contacts):
         """
 
     try:
+        contacts_len = len(contacts)
         for contact in contacts:
             contact_id = contact.get("id")
             addresses_json = contact.get("addresses", '[]')
@@ -470,6 +474,6 @@ def insert_contacts_into_table(cursor, contacts):
             )
 
         cursor.connection.commit()
-        logger.info("Contacts inserted into the table successfully.")
+        logger.info(f"{contacts_len} Contacts inserted into the table successfully.")
     except Exception as e:
         logger.error(f"Error inserting contacts into the table: {e}")

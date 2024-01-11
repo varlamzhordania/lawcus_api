@@ -1,6 +1,9 @@
 from utils import table_exists
 from logger import leads_logger as logger
 
+if not logger:
+    from logger import app_logger as logger
+
 
 def create_leads_table(cursor):
     """
@@ -44,10 +47,11 @@ def insert_leads_into_table(cursor, leads):
     """
 
     try:
+        leads_len = len(leads)
         for lead in leads:
             cursor.execute(insert_query, lead)
 
         cursor.connection.commit()
-        logger.info("Leads inserted into the table successfully.")
+        logger.info(f"{leads_len} Leads inserted into the table successfully.")
     except Exception as e:
         logger.error(f"Error inserting leads into the table: {e}")

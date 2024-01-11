@@ -2,6 +2,9 @@ from utils import table_exists
 from logger import tasks_logger as logger
 import json
 
+if not logger:
+    from logger import app_logger as logger
+
 
 def create_tasks_table(cursor):
     """
@@ -91,7 +94,7 @@ def insert_task_tags_into_table(cursor, task_id, tags):
             )
 
         cursor.connection.commit()
-        logger.info("Task tags inserted into the table successfully.")
+        # logger.info("Task tags inserted into the table successfully.")
     except Exception as e:
         logger.error(f"Error inserting task tags into the table: {e}")
 
@@ -154,7 +157,7 @@ def insert_task_due_settings_into_table(cursor, parent_task_id, task_due_setting
         )
 
         cursor.connection.commit()
-        logger.info("Task due settings inserted into the table successfully.")
+        # logger.info("Task due settings inserted into the table successfully.")
     except Exception as e:
         logger.error(f"Error inserting Task due settings into the table: {e}")
 
@@ -179,6 +182,7 @@ def insert_tasks_into_table(cursor, tasks):
     """
 
     try:
+        tasks_len = len(tasks)
         for task in tasks:
             # Ensure that parameter names match the bind variables in the query
             task_id = task.get("id")
@@ -217,7 +221,7 @@ def insert_tasks_into_table(cursor, tasks):
             )
 
         cursor.connection.commit()
-        logger.info("Tasks inserted into the table successfully.")
+        logger.info(f"{tasks_len} Tasks inserted into the table successfully.")
     except Exception as e:
 
         logger.error(f"Error inserting Tasks into the table: {e}")

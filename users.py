@@ -2,6 +2,9 @@ from utils import table_exists
 from logger import users_logger as logger
 import json
 
+if not logger:
+    from logger import app_logger as logger
+
 
 def create_users_me_table(cursor):
     """
@@ -66,9 +69,9 @@ def insert_users_me_into_table(cursor, users_me_data):
             },
         )
         cursor.connection.commit()
-        logger.info("LAWCUS Users Me data inserted into the table successfully.")
+        logger.info("Users Me data inserted into the table successfully.")
     except Exception as e:
-        logger.error(f"Error inserting LAWOCUS Users Me data into the table: {e}")
+        logger.error(f"Error inserting Users Me data into the table: {e}")
 
 
 def create_users_teammates_table(cursor):
@@ -118,6 +121,7 @@ def insert_users_teammates_into_table(cursor, teammates_data):
     """
 
     try:
+        teammates_data_len = len(teammates_data)
         for teammate in teammates_data:
             cursor.execute(
                 insert_query,
@@ -135,9 +139,9 @@ def insert_users_teammates_into_table(cursor, teammates_data):
                 },
             )
         cursor.connection.commit()
-        logger.info("LAWCUS Users Teammates data inserted into the table successfully.")
+        logger.info(f"{teammates_data_len} Users Teammates data inserted into the table successfully.")
     except Exception as e:
-        logger.error(f"Error inserting LAWOCUS Users Teammates data into the table: {e}")
+        logger.error(f"Error inserting Users Teammates data into the table: {e}")
 
 
 def create_users_team_table(cursor):
@@ -211,9 +215,9 @@ def insert_users_team_into_table(cursor, team_data):
             },
         )
         cursor.connection.commit()
-        logger.info("LAWCUS Users Team data inserted into the table successfully.")
+        logger.info("Users Team data inserted into the table successfully.")
     except Exception as e:
-        logger.error(f"Error inserting LAWOCUS Users Team data into the table: {e}")
+        logger.error(f"Error inserting Users Team data into the table: {e}")
 
 
 def create_users_contacts_table(cursor):
@@ -405,7 +409,7 @@ def insert_users_contact_addresses_into_table(cursor, contact_id, addresses):
             )
 
         cursor.connection.commit()
-        logger.info("Users Contact addresses inserted into the table successfully.")
+        # logger.info("Users Contact addresses inserted into the table successfully.")
     except Exception as e:
         logger.error(f"Error inserting users contact addresses into the table: {e}")
 
@@ -437,7 +441,7 @@ def insert_users_contact_phones_into_table(cursor, contact_id, phones):
             )
 
         cursor.connection.commit()
-        logger.info("Users Contact phones inserted into the table successfully.")
+        # logger.info("Users Contact phones inserted into the table successfully.")
     except Exception as e:
         logger.error(f"Error inserting users contact phones into the table: {e}")
 
@@ -468,7 +472,7 @@ def insert_users_contact_tags_into_table(cursor, contact_id, tags):
             )
 
         cursor.connection.commit()
-        logger.info("Users Contact tags inserted into the table successfully.")
+        # logger.info("Users Contact tags inserted into the table successfully.")
     except Exception as e:
         logger.error(f"Error inserting users contact tags into the table: {e}")
 
@@ -500,7 +504,7 @@ def insert_users_emails_into_table(cursor, contact_id, emails):
             )
 
         cursor.connection.commit()
-        logger.info("Users Contact emails inserted into the table successfully.")
+        # logger.info("Users Contact emails inserted into the table successfully.")
     except Exception as e:
         logger.error(f"Error inserting users contact emails into the table: {e}")
 
@@ -528,6 +532,7 @@ def insert_users_contacts_into_table(cursor, contacts_data):
     """
 
     try:
+        contacts_data_len = len(contacts_data)
         for contact in contacts_data:
 
             contact_id = contact.get("id")
@@ -591,7 +596,7 @@ def insert_users_contacts_into_table(cursor, contacts_data):
             )
 
         cursor.connection.commit()
-        logger.info("Users Contacts data inserted into the table successfully.")
+        logger.info(f"{contacts_data_len} Users Contacts data inserted into the table successfully.")
     except Exception as e:
         logger.error(f"Error inserting Users Contacts data into the table: {e}")
 
@@ -792,7 +797,7 @@ def insert_users_matter_tags_into_table(cursor, matter_id, tags):
             )
 
         cursor.connection.commit()
-        logger.info("Users Matter Tags inserted into the table successfully.")
+        # logger.info("Users Matter Tags inserted into the table successfully.")
     except Exception as e:
         logger.error(f"Error inserting Users Matter Tags into the table: {e}")
 
@@ -831,6 +836,7 @@ def insert_users_matters_into_table(cursor, matters_data):
     """
 
     try:
+        matters_data_len= len(matters_data)
         for matter in matters_data:
             # Extract assignees and custom_fields arrays
             assignees = matter.get("assignees", [])
@@ -938,6 +944,6 @@ def insert_users_matters_into_table(cursor, matters_data):
             )
 
         cursor.connection.commit()
-        logger.info("LAWCUS Users Matters data inserted into the table successfully.")
+        logger.info(f"{matters_data_len} Users Matters data inserted into the table successfully.")
     except Exception as e:
-        logger.error(f"Error inserting LAWOCUS Users Matters data into the table: {e}")
+        logger.error(f"Error inserting Users Matters data into the table: {e}")

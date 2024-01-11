@@ -1,6 +1,9 @@
 from utils import table_exists
 from logger import interactions_logger as logger
 
+if not logger:
+    from logger import app_logger as logger
+
 
 def create_interactions_table(cursor):
     """
@@ -53,6 +56,7 @@ def insert_interactions_into_table(cursor, interactions):
     """
 
     try:
+        interactions_len = len(interactions)
         for interaction in interactions:
             # Ensure that parameter names match the bind variables in the query
             cursor.execute(
@@ -71,6 +75,6 @@ def insert_interactions_into_table(cursor, interactions):
             )
 
         cursor.connection.commit()
-        logger.info("Interactions inserted into the table successfully.")
+        logger.info(f"{interactions_len} Interactions inserted into the table successfully.")
     except Exception as e:
         logger.error(f"Error inserting Interactions into the table: {e}")

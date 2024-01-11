@@ -1,6 +1,9 @@
 from utils import table_exists
 from logger import reports_logger as logger
 
+if not logger:
+    from logger import app_logger as logger
+
 
 def create_reports_payment_collected_table(cursor):
     """
@@ -95,6 +98,7 @@ def insert_reports_payment_collected_into_table(cursor, payment_collected_report
     """
 
     try:
+        payment_collected_reports_len = len(payment_collected_reports)
         for report in payment_collected_reports:
             key = report.get("key")
             payments = report.get("payments", [])
@@ -146,9 +150,11 @@ def insert_reports_payment_collected_into_table(cursor, payment_collected_report
                 )
 
         cursor.connection.commit()
-        logger.info("LAWCUS Reports Payment Collected data inserted into the table successfully.")
+        logger.info(
+            f"{payment_collected_reports_len} Reports Payment Collected data inserted into the table successfully."
+        )
     except Exception as e:
-        logger.error(f"Error inserting LAWOCUS Reports Payment Collected data into the table: {e}")
+        logger.error(f"Error inserting Reports Payment Collected data into the table: {e}")
 
 
 def create_reports_invoice_history_table(cursor):
@@ -211,6 +217,7 @@ def insert_reports_invoice_history_into_table(cursor, invoice_history_report):
     """
 
     try:
+        invoice_history_report_len = len(invoice_history_report)
         for client_id, invoices in invoice_history_report.get("list", {}).items():
             for invoice in invoices:
                 cursor.execute(
@@ -236,9 +243,9 @@ def insert_reports_invoice_history_into_table(cursor, invoice_history_report):
                 )
 
         cursor.connection.commit()
-        logger.info("LAWCUS Reports Invoice History data inserted into the table successfully.")
+        logger.info(f"{invoice_history_report_len} Reports Invoice History data inserted into the table successfully.")
     except Exception as e:
-        logger.error(f"Error inserting LAWOCUS Reports Invoice History data into the table: {e}")
+        logger.error(f"Error inserting Reports Invoice History data into the table: {e}")
 
 
 def create_reports_matter_balance_table(cursor):
@@ -295,6 +302,7 @@ def insert_reports_matter_balance_into_table(cursor, matter_balance_reports):
 
     try:
         import json
+        matter_balance_reports_len = len(matter_balance_reports)
         for matter_balance_report in matter_balance_reports:
             key = matter_balance_report.get("key")
             for matter_data in matter_balance_report.get("matters", []):
@@ -315,9 +323,9 @@ def insert_reports_matter_balance_into_table(cursor, matter_balance_reports):
                 )
 
         cursor.connection.commit()
-        logger.info("LAWCUS Reports Matter Balance data inserted into the table successfully.")
+        logger.info(f"{matter_balance_reports_len} Reports Matter Balance data inserted into the table successfully.")
     except Exception as e:
-        logger.error(f"Error inserting LAWCUS Reports Matter Balance data into the table: {e}")
+        logger.error(f"Error inserting Reports Matter Balance data into the table: {e}")
 
 
 def create_reports_client_trust_table(cursor):
@@ -362,6 +370,7 @@ def insert_reports_client_trust_into_table(cursor, client_trust_report):
     """
 
     try:
+        client_trust_report_len = len(client_trust_report)
         for client_data in client_trust_report:
             for account_data in client_data.get("accounts", []):
                 cursor.execute(
@@ -376,9 +385,9 @@ def insert_reports_client_trust_into_table(cursor, client_trust_report):
                 )
 
         cursor.connection.commit()
-        logger.info("LAWCUS Reports Client Trust data inserted into the table successfully.")
+        logger.info(f"{client_trust_report_len} Reports Client Trust data inserted into the table successfully.")
     except Exception as e:
-        logger.error(f"Error inserting LAWOCUS Reports Client Trust data into the table: {e}")
+        logger.error(f"Error inserting Reports Client Trust data into the table: {e}")
 
 
 def create_reports_client_ledger_table(cursor):
@@ -484,7 +493,7 @@ def insert_reports_client_ledger_into_table(cursor, client_ledger_report):
 
         # Extract client_id and transactions directly from the dictionary
         client_id, transactions = next(iter(client_ledger_report.items()), (None, []))
-
+        transactions_len = len(transactions)
         for transaction_data in transactions:
             cursor.execute(
                 insert_query,
@@ -534,9 +543,9 @@ def insert_reports_client_ledger_into_table(cursor, client_ledger_report):
             )
 
         cursor.connection.commit()
-        logger.info("LAWCUS Reports Client Ledger data inserted into the table successfully.")
+        logger.info(f"{transactions_len} Reports Client Ledger data inserted into the table successfully.")
     except Exception as e:
-        logger.error(f"Error inserting LAWOCUS Reports Client Ledger data into the table: {e}")
+        logger.error(f"Error inserting Reports Client Ledger data into the table: {e}")
 
 
 def create_reports_trust_ledger_table(cursor):
@@ -637,6 +646,7 @@ def insert_reports_trust_ledger_into_table(cursor, trust_ledger_report):
     """
 
     try:
+        trust_ledger_report_len = len(trust_ledger_report)
         for trust_data in trust_ledger_report:
             for transaction_data in trust_data.get("transactions", []):
                 cursor.execute(
@@ -689,9 +699,9 @@ def insert_reports_trust_ledger_into_table(cursor, trust_ledger_report):
                 )
 
         cursor.connection.commit()
-        logger.info("LAWCUS Reports Trust Ledger data inserted into the table successfully.")
+        logger.info(f"{trust_ledger_report_len} Reports Trust Ledger data inserted into the table successfully.")
     except Exception as e:
-        logger.error(f"Error inserting LAWOCUS Reports Trust Ledger data into the table: {e}")
+        logger.error(f"Error inserting Reports Trust Ledger data into the table: {e}")
 
 
 def create_reports_time_entries_table(cursor):
@@ -798,9 +808,9 @@ def insert_reports_time_entries_into_table(cursor, time_entries_report):
                 )
 
         cursor.connection.commit()
-        logger.info("LAWCUS Reports Time Entries data inserted into the table successfully.")
+        logger.info("Reports Time Entries data inserted into the table successfully.")
     except Exception as e:
-        logger.error(f"Error inserting LAWOCUS Reports Time Entries data into the table: {e}")
+        logger.error(f"Error inserting Reports Time Entries data into the table: {e}")
 
 
 def create_reports_revenue_table(cursor):
@@ -871,6 +881,7 @@ def insert_reports_revenue_into_table(cursor, revenue_report):
     """
 
     try:
+        revenue_report_len = len(revenue_report)
         for key, revenue_entries in revenue_report.items():
             for revenue_entry in revenue_entries:
                 cursor.execute(
@@ -901,9 +912,9 @@ def insert_reports_revenue_into_table(cursor, revenue_report):
                 )
 
         cursor.connection.commit()
-        logger.info("LAWCUS Reports Revenue data inserted into the table successfully.")
+        logger.info(f"{revenue_report_len} Reports Revenue data inserted into the table successfully.")
     except Exception as e:
-        logger.error(f"Error inserting LAWOCUS Reports Revenue data into the table: {e}")
+        logger.error(f"Error inserting Reports Revenue data into the table: {e}")
 
 
 def create_reports_accounts_receivable_table(cursor):
@@ -963,6 +974,7 @@ def insert_reports_accounts_receivable_into_table(cursor, accounts_receivable_re
     """
 
     try:
+        accounts_receivable_report_len = len(accounts_receivable_report)
         for key, receivable_entries in accounts_receivable_report.items():
             for receivable_entry in receivable_entries:
                 cursor.execute(
@@ -985,9 +997,9 @@ def insert_reports_accounts_receivable_into_table(cursor, accounts_receivable_re
                 )
 
         cursor.connection.commit()
-        logger.info("LAWCUS Reports Accounts Receivable data inserted into the table successfully.")
+        logger.info(f"{accounts_receivable_report_len} Reports Accounts Receivable data inserted into the table successfully.")
     except Exception as e:
-        logger.error(f"Error inserting LAWOCUS Reports Accounts Receivable data into the table: {e}")
+        logger.error(f"Error inserting Reports Accounts Receivable data into the table: {e}")
 
 
 def create_reports_matters_info_table(cursor):
@@ -1043,6 +1055,6 @@ def insert_reports_matters_info_into_table(cursor, matters_info_report):
             },
         )
         cursor.connection.commit()
-        logger.info("LAWCUS Reports Matters Info data inserted into the table successfully.")
+        logger.info("Reports Matters Info data inserted into the table successfully.")
     except Exception as e:
-        logger.error(f"Error inserting LAWOCUS Reports Matters Info data into the table: {e}")
+        logger.error(f"Error inserting Reports Matters Info data into the table: {e}")

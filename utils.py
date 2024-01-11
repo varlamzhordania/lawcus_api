@@ -3,9 +3,20 @@ from logger import app_logger as logger
 import smtplib
 from email.mime.text import MIMEText
 import configparser
+from datetime import datetime
+
 
 config = configparser.ConfigParser()
 config.read('lawcus_config.ini')
+
+
+def get_timestamp():
+    """
+    Get the current date and time as a formatted timestamp.
+
+    :return: Formatted timestamp string (e.g., "2023-01-20_15-45-30")
+    """
+    return datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
 
 def table_exists(cursor, table_name):

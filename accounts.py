@@ -1,6 +1,9 @@
 from utils import table_exists
 from logger import accounts_logger as logger
 
+if not logger:
+    from logger import app_logger as logger
+
 
 def create_accounts_table(cursor):
     """
@@ -59,6 +62,7 @@ def insert_accounts_into_table(cursor, accounts):
     """
 
     try:
+        accounts_len = len(accounts)
         for account in accounts:
             cursor.execute(
                 insert_query,
@@ -81,6 +85,6 @@ def insert_accounts_into_table(cursor, accounts):
             )
 
         cursor.connection.commit()
-        logger.info("Accounts inserted into the table successfully.")
+        logger.info(f"{accounts_len} Accounts inserted into the table successfully.")
     except Exception as e:
         logger.error(f"Error inserting Accounts into the table: {e}")

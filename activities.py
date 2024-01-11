@@ -1,6 +1,9 @@
 from utils import table_exists
 from logger import activities_logger as logger
 
+if not logger:
+    from logger import app_logger as logger
+
 
 def create_activity_time_entry_table(cursor):
     """
@@ -66,6 +69,7 @@ def insert_activity_time_entries_into_table(cursor, time_entries):
     """
 
     try:
+        time_entries_len = len(time_entries)
         for entry in time_entries:
             cursor.execute(
                 insert_query,
@@ -91,7 +95,7 @@ def insert_activity_time_entries_into_table(cursor, time_entries):
                 my_client_id=entry.get("client_id")
             )
         cursor.connection.commit()
-        logger.info("Time Entries inserted into the table successfully.")
+        logger.info(f"{time_entries_len} Time Entries inserted into the table successfully.")
     except Exception as e:
         logger.error(f"Error inserting Time Entries into the table: {e}")
 
@@ -158,6 +162,7 @@ def insert_activity_expenses_into_table(cursor, expenses):
     """
 
     try:
+        expenses_len = len(expenses)
         for expense in expenses:
             # Ensure that parameter names match the bind variables in the query
             cursor.execute(
@@ -183,7 +188,7 @@ def insert_activity_expenses_into_table(cursor, expenses):
                 my_matteruuid=expense.get("matteruuid")
             )
         cursor.connection.commit()
-        logger.info("Expenses inserted into the table successfully.")
+        logger.info(f"{expenses_len} Expenses inserted into the table successfully.")
     except Exception as e:
         logger.error(f"Error inserting Expenses into the table: {e}")
 
@@ -249,6 +254,7 @@ def insert_activity_flat_fees_into_table(cursor, flat_fees):
     """
 
     try:
+        flat_fees_len = len(flat_fees)
         for flat_fee in flat_fees:
             # Ensure that parameter names match the bind variables in the query
             cursor.execute(
@@ -273,7 +279,7 @@ def insert_activity_flat_fees_into_table(cursor, flat_fees):
                 my_matteruuid=flat_fee.get("matteruuid")
             )
         cursor.connection.commit()
-        logger.info("Flat Fees inserted into the table successfully.")
+        logger.info(f"{flat_fees_len} Flat Fees inserted into the table successfully.")
     except Exception as e:
         logger.error(f"Error inserting Flat Fees into the table: {e}")
 
@@ -322,6 +328,7 @@ def insert_activity_category_into_table(cursor, activity_categories):
     """
 
     try:
+        activity_categories_len = len(activity_categories)
         for activity_category in activity_categories:
             # Ensure that parameter names match the bind variables in the query
             cursor.execute(
@@ -336,7 +343,7 @@ def insert_activity_category_into_table(cursor, activity_categories):
             )
 
         cursor.connection.commit()
-        logger.info("Activity Categories inserted into the table successfully.")
+        logger.info(f"{activity_categories_len} Activity Categories inserted into the table successfully.")
     except Exception as e:
         logger.error(f"Error inserting Activity Categories into the table: {e}")
 
@@ -365,11 +372,11 @@ def create_activity_billing_items_table(cursor):
             )
             """
             cursor.execute(table_creation_query)
-            logger.info("LAWCUS Billing Items table created successfully.")
+            logger.info("Billing Items table created successfully.")
         else:
-            logger.info("LAWCUS Billing Items table already exists.")
+            logger.info("Billing Items table already exists.")
     except Exception as e:
-        logger.error(f"Error creating LAWOCUS Billing Items table: {e}")
+        logger.error(f"Error creating Billing Items table: {e}")
 
 
 def insert_activity_billing_items_into_table(cursor, billing_items_data):
@@ -389,6 +396,7 @@ def insert_activity_billing_items_into_table(cursor, billing_items_data):
     """
 
     try:
+        billing_items_data_len = len(billing_items_data)
         for billing_item in billing_items_data.get("list", []):
             cursor.execute(
                 insert_query,
@@ -406,6 +414,6 @@ def insert_activity_billing_items_into_table(cursor, billing_items_data):
             )
 
         cursor.connection.commit()
-        logger.info("LAWCUS Billing Items data inserted into the table successfully.")
+        logger.info(f"{billing_items_data_len} Billing Items data inserted into the table successfully.")
     except Exception as e:
-        logger.error(f"Error inserting LAWOCUS Billing Items data into the table: {e}")
+        logger.error(f"Error inserting Billing Items data into the table: {e}")

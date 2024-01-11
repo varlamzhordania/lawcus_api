@@ -2,6 +2,9 @@ from utils import table_exists
 import json
 from logger import matters_logger as logger
 
+if not logger:
+    from logger import app_logger as logger
+
 
 def create_matters_table(cursor):
     """
@@ -208,7 +211,7 @@ def insert_matter_tags_into_table(cursor, matter_id, tags):
                 color=tag.get("color")
             )
         cursor.connection.commit()
-        logger.info("Matter Tags inserted into the table successfully.")
+        # logger.info("Matter Tags inserted into the table successfully.")
     except Exception as e:
         logger.error(f"Error inserting Matter Tags into the table: {e}")
 
@@ -250,6 +253,7 @@ def insert_matters_into_table(cursor, matters):
     """
 
     try:
+        matters_len = len(matters)
         for matter in matters:
 
             # Extract assignees and custom_fields arrays
@@ -366,6 +370,6 @@ def insert_matters_into_table(cursor, matters):
                 my_lawcus_url=matter.get("lawcus_url"),
             )
         cursor.connection.commit()
-        logger.info("Matters inserted into the table successfully.")
+        logger.info(f"{matters_len} Matters inserted into the table successfully.")
     except Exception as e:
         logger.error(f"Error inserting matters into the table: {e}")
