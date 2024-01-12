@@ -12,6 +12,7 @@ def create_matters_table(cursor):
 
     Modify the table creation query based on your specific requirements.
     """
+
     table_name = "LAWCUS_MATTERS"
 
     try:
@@ -210,6 +211,7 @@ def insert_matter_tags_into_table(cursor, matter_id, tags):
                 name=tag.get("name"),
                 color=tag.get("color")
             )
+
         cursor.connection.commit()
         # logger.info("Matter Tags inserted into the table successfully.")
     except Exception as e:

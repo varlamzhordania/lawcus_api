@@ -36,6 +36,7 @@ from reports import create_reports_matters_info_table, insert_reports_matters_in
 
 config = configparser.ConfigParser()
 config.read('lawcus_config.ini')
+client_name = config["Email"]["client_name"]
 
 
 def configure_oracle_client():
@@ -72,14 +73,14 @@ def connect_to_database(username, password, host, port, service_id):
     except oracledb.DatabaseError as e:
         logger.error(f"Error connecting to the database: {e}")
         send_email(
-            f"Lawcus Python Sync Failed for database on {get_timestamp()}",
+            f"Lawcus Python Sync Failed for {client_name} - database on {get_timestamp()}",
             f"Error connecting to the database: {e}"
         )
         raise
     except Exception as e:
         logger.error(f"Error occurred during database connection: {e}")
         send_email(
-            f"Lawcus Python Sync Failed for database on {get_timestamp()}",
+            f"Lawcus Python Sync Failed for {client_name} - database on {get_timestamp()}",
             f"Error occurred during database connection: {e}"
         )
         raise
@@ -108,7 +109,7 @@ def make_api_request(endpoint, params=None, base_url=None, headers=None, **kwarg
     except requests.exceptions.RequestException as e:
         logger.error(f"Error making API request to {endpoint}: {e}")
         send_email(
-            f"Lawcus Python Sync Failed for {endpoint} on {get_timestamp()}",
+            f"Lawcus Python Sync Failed for {client_name} - {endpoint} on {get_timestamp()}",
             f"Error making API request to {endpoint}: {e}"
         )
         return None
@@ -150,7 +151,7 @@ if __name__ == "__main__":
 
         print(f"Please make sure the following database credentials are provided: {', '.join(missing_credentials)}")
         send_email(
-            f"Lawcus Python Sync Failed for database on {get_timestamp()}",
+            f"Lawcus Python Sync Failed for {client_name} - database on {get_timestamp()}",
             f"Please make sure the following database credentials are provided: {', '.join(missing_credentials)}"
         )
         sys.exit(1)  # Exit with a non-zero status code to indicate an error
@@ -197,7 +198,7 @@ if __name__ == "__main__":
     else:
         print("Please make sure client_id, redirect_uri, and client_secret are valid.")
         send_email(
-            f"Lawcus Python Sync Failed for API credentials on {get_timestamp()}",
+            f"Lawcus Python Sync Failed for {client_name} - API credentials on {get_timestamp()}",
             "Please make sure client_id, redirect_uri, and client_secret are valid."
         )
         sys.exit(1)
@@ -505,7 +506,7 @@ if __name__ == "__main__":
             "Check your Lawcus API details and verify the access token's validity."
         )
         send_email(
-            f"Lawcus Python Sync Failed for API credentials on {get_timestamp()}",
+            f"Lawcus Python Sync Failed for {client_name} - API credentials on {get_timestamp()}",
             "Please ensure that the access token is valid and the required endpoints exist. Check your Lawcus API details and verify the access token's validity."
         )
         sys.exit(1)

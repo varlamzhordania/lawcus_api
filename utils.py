@@ -8,7 +8,7 @@ from datetime import datetime
 
 config = configparser.ConfigParser()
 config.read('lawcus_config.ini')
-
+client_name = config["Email"]["client_name"]
 
 def get_timestamp():
     """
